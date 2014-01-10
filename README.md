@@ -20,8 +20,7 @@ Requirements
 
 Example
 -------
-Install something like S3QL to mount your cloud storage container to
-a folder. Assuming you've mounted the storage to /assets/Uploads:
+Assuming you have a CloudFiles container called site-uploads:
 
 *mysite/_config/cloudassets.yml:*
 ```
@@ -30,7 +29,12 @@ name: assetsconfig
 ---
 CloudAssets:
   map:
-    'assets/Uploads': 'http://yourcdnbaseurl.com/'
+    'assets/Uploads':
+      Type: RackspaceBucket
+      BaseURL: 'http://yourcdnbaseurl.com/'
+      Container: site-uploads
+      UserName: yourlogin
+      ApiKey: yourkey
 ```
 
 
