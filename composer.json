@@ -1,0 +1,18 @@
+{
+	"name": "markguinn/silverstripe-cloudassets",
+	"description": "Allows some or all of the assets folder to be located in a cloud storage container (CloudFiles, etc.)",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe", "assets", "cdn", "cloud storage", "rackspace", "cloudfiles"],
+	"license": "MIT",
+	"authors": [{
+		"name": "Mark Guinn",
+		"email": "mark@adaircreative.com",
+		"homepage": "http://github.com/markguinn"
+	}],
+	"extra": {
+		"installer-name": "cloudassets"
+	},
+	"require": {
+		"silverstripe/framework": "~3.1"
+	}
+}
