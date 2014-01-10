@@ -1,14 +1,7 @@
 Cloud Assets Module
 ===================
 
-In this first version it simply allows you to map one or more paths
-within your assets folder to a parallel location on a CDN. It is
-doesn't handle the CMS side of things at all, instead assuming you're
-somehow mounting the folders within /assets/ using S3QL, CloudFuse,
-CloudFront, s3fs, etc.
-
-Hopefully we can explore the CMS side in the future and remove the
-requirement for manually mounting the cloud storage to assets.
+Allows you to host all or part of the assets folder on a cloud storage container (CDN).
 
 NOTE: This is not usable yet. It's very close but it's still just a prototype.
 
