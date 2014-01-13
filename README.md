@@ -60,7 +60,9 @@ Scenarios Where This Won't Work
 
 TODO
 ----
-- Image resizing
+- Keep track of Image_Cached in a separate db table so it's better utilised in redundant
+  environments.
+- Write test for cached image meta data when no cache is present
 - Implement Rackspace CloudFiles driver
 - Option to leave the files in tact locally and only look at the timestamp. This would
   give MUCH wider compatibility.
