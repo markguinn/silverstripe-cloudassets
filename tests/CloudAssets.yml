@@ -28,3 +28,9 @@ File:
       Filename: assets/FileTest-folder1/File1.txt
       Name: File1.txt
       ParentID: =>Folder.folder1
+
+Image:
+   png:
+      Filename: assets/FileTest-folder1/test-png32.png
+      Name: test-png32.png
+      ParentID: =>Folder.folder1

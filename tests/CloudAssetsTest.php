@@ -22,7 +22,11 @@ class CloudAssetsTest extends SapphireTest
 		$f2 = $this->objFromFixture('File', 'asdf');
 		$this->assertTrue($f1->hasExtension('CloudFileExtension'));
 
-		$f1->updateCloudStatus(); // this is what happens in onAfterWrite as well
+		// NOTE: we're having to call updateCloudStatus here in the tests
+		// because the files weren't present when the objects were created
+		// due to the order of setup in tests. Turns out it's handy for
+		// testing because we can test before and after states.
+		$f1->updateCloudStatus();
 		$this->assertEquals('CloudFile', $f1->ClassName);
 
 		$f2->updateCloudStatus();
@@ -101,7 +105,52 @@ class CloudAssetsTest extends SapphireTest
 	}
 
 
-	// TODO: image resize
+	function testCloudMetaData() {
+		CloudAssets::inst()->updateAllFiles();
+		$f1 = $this->objFromFixture('File', 'file1-folder1');
+
+		$f1->setCloudMeta(array('abc' => '123'));
+		$data = $f1->getCloudMeta();
+		$this->assertTrue(is_array($data),          'should be an array');
+		$this->assertEquals(1, count($data),        'should have one index');
+		$this->assertEquals('123', $data['abc'],    'should have the correct key/val');
+
+		$f1->setCloudMeta('def', 456);
+		$data = $f1->getCloudMeta();
+		$this->assertEquals(2, count($data),        'should have two indexes');
+		$this->assertEquals('123', $data['abc'],    'should have the original key/val');
+		$this->assertEquals('456', $data['def'],    'should have the new key/val');
+	}
+
+
+	function testFormattedImage() {
+		CloudAssets::inst()->updateAllFiles();
+
+		$img = $this->objFromFixture('Image', 'png');
+		$this->assertTrue($img instanceof CloudImage);
+		$this->assertEquals(20, $img->getWidth());
+		$this->assertEquals(20, $img->getHeight());
+		$this->assertEquals('http://testcdn.com/test-png32.png', $img->Link());
+
+		$countBefore = File::get()->count();
+		$resized = $img->SetWidth(10);
+		$countAfter = File::get()->count();
+		$this->assertEquals(10, $resized->getWidth());
+		$this->assertEquals(10, $resized->getHeight());
+		$this->assertEquals('http://testcdn.com/_resampled/SetWidth10-test-png32.png', $resized->Link());
+		$this->assertEquals($countBefore, $countAfter, 'SetWidth should not create a database record');
+		$bucket = $resized->getCloudBucket();
+		$this->assertTrue(in_array($resized, $bucket->uploads), 'mock bucket should have recorded an upload');
+
+		// deleting the image should also delete the resize
+		$img->delete();
+		$this->assertTrue(in_array($resized->Filename, $bucket->deletes), 'mock bucket should have recorded a delete');
+	}
+
+
+	// TODO: change ParentID
+	// TODO: rename folder
+	// TODO: local copy
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -131,6 +180,7 @@ class CloudAssetsTest extends SapphireTest
 		/* Create a test files for each of the fixture references */
 		$fileIDs = $this->allFixtureIDs('File');
 		foreach($fileIDs as $fileID) {
+			if ($fileID == 'png') continue;
 			$file = DataObject::get_by_id('File', $fileID);
 			$fh = fopen(BASE_PATH."/$file->Filename", "w");
 			fwrite($fh, str_repeat('x',1000));
@@ -146,6 +196,11 @@ class CloudAssetsTest extends SapphireTest
 			$page->write();
 			$page->publish('Stage', 'Live');
 		}
+
+		$src  = dirname(__FILE__) . '/test-png32.png';
+		$dest = ASSETS_PATH . '/FileTest-folder1/test-png32.png';
+		$f = copy($src, $dest);
+		if (!$f) die('unable to copy $src to $dest');
 	}
 
 	public function tearDown() {

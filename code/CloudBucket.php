@@ -8,11 +8,18 @@
  */
 abstract class CloudBucket extends Object
 {
+	const BASE_URL   = 'BaseURL';
+	const LOCAL_COPY = 'LocalCopy';
+	const TYPE       = 'Type';
+
 	/** @var string $localPath - local path being replaced (e.g. assets/Uploads) */
 	protected $localPath;
 
 	/** @var string $baseURL - CDN url */
 	protected $baseURL;
+
+	/** @var  array $config */
+	protected $config;
 
 
 	/**
@@ -22,9 +29,11 @@ abstract class CloudBucket extends Object
 
 
 	/**
-	 * @param File $f
+	 * NOTE: This method must handle string filenames as well
+	 * for the purpose of deleting cached resampled images.
+	 * @param File|string $f
 	 */
-	abstract public function delete(File $f);
+	abstract public function delete($f);
 
 
 	/**
@@ -36,12 +45,19 @@ abstract class CloudBucket extends Object
 
 
 	/**
+	 * @param File $f
+	 * @return string
+	 */
+	abstract public function getContents(File $f);
+
+
+	/**
 	 * @param string $path
 	 * @param array  $cfg
 	 */
 	public function __construct($path, array $cfg=array()) {
 		$this->localPath = $path;
-		$this->baseURL   = empty($cfg['BaseURL']) ? (Director::baseURL() . $path) : $cfg['BaseURL'];
+		$this->baseURL   = empty($cfg[self::BASE_URL]) ? (Director::baseURL() . $path) : $cfg[self::BASE_URL];
 		if (substr($this->localPath, -1) != '/') $this->localPath .= '/';
 		if (substr($this->baseURL, -1) != '/') $this->baseURL .= '/';
 	}
@@ -63,4 +79,11 @@ abstract class CloudBucket extends Object
 		return $this->baseURL . str_replace($this->localPath, '', $f->getFilename());
 	}
 
+
+	/**
+	 * @return bool
+	 */
+	public function isLocalCopyEnabled() {
+		return !empty($this->config[self::LOCAL_COPY]);
+	}
 }

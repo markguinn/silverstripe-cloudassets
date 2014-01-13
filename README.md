@@ -53,11 +53,21 @@ This setup allows you to forgo mounting the cloud storage via s3fs, CloudFuse, e
 shouldn't require changes to the Silverstripe file subsystem.
 
 
+Scenarios Where This Won't Work
+-------------------------------
+- Modules or other contexts where files are accessed directly
+
+
 TODO
 ----
 - Image resizing
 - Implement Rackspace CloudFiles driver
-- I would love for someone to implement some other drivers
+- Option to leave the files in tact locally and only look at the timestamp. This would
+  give MUCH wider compatibility.
+- Handle missing local file
+- I would love for someone to implement some other drivers - S3, Swift, Google, etc.
+  It's very easy to implement drivers - just extend CloudBucket and implement a few
+  methods.
 
 
 Developer(s)

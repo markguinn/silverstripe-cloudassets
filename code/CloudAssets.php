@@ -9,13 +9,22 @@
 class CloudAssets extends Object
 {
 	/** @var array */
-	private static $map = array();
+	private static $map = array(
+		//'assets/folder/path' => array(
+		//  'Type'      => 'RackspaceBucket',
+		//  'BaseURL'   => 'http://cdnurl.com/',
+		//  'Container' => 'container-name',
+		//  'UserID'    => 'username',
+		//  'ApiKey'    => 'key',
+		//  'LocalCopy' => true,
+		//);
+	);
 
 	/** @var array - add to this if you have other file subclasses floating around */
 	private static $wrappers = array(
 		'File'          => 'CloudFile',
-		'Folder'        => 'CloudFolder',
 		'Image'         => 'CloudImage',
+		'CloudImage_Cached' => 'CloudImage_Cached', // this is awkward but prevents it from trying to transform Image_Cached
 	);
 
 	/** @var string - placeholder string used for local files */
@@ -42,10 +51,10 @@ class CloudAssets extends Object
 		$maps = Config::inst()->get('CloudAssets', 'map');
 
 		foreach ($maps as $path => $cfg) {
-			if (empty($cfg['Type'])) continue;
+			if (empty($cfg[ CloudBucket::TYPE ])) continue;
 			if (strpos($filename, $path) === 0) {
 				if (!isset($this->bucketCache[$path])) {
-					$this->bucketCache[$path] = Injector::inst()->create($cfg['Type'], $path, $cfg);
+					$this->bucketCache[$path] = Injector::inst()->create($cfg[CloudBucket::TYPE], $path, $cfg);
 				}
 
 				return $this->bucketCache[$path];
