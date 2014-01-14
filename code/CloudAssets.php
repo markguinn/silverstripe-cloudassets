@@ -8,6 +8,9 @@
  */
 class CloudAssets extends Object
 {
+	/** @var bool - kill switch via config - if true the module will ignore all cloud buckets */
+	private static $disabled = false;
+
 	/** @var array */
 	private static $map = array(
 		//'assets/folder/path' => array(
@@ -47,6 +50,7 @@ class CloudAssets extends Object
 	 * @return CloudBucket
 	 */
 	public function map($filename) {
+		if (Config::inst()->get('CloudAssets', 'disabled')) return null;
 		if (is_object($filename)) $filename = $filename->getFilename();
 		$maps = Config::inst()->get('CloudAssets', 'map');
 
