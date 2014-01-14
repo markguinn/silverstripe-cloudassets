@@ -3,7 +3,7 @@ Cloud Assets Module
 
 Allows you to host all or part of the assets folder on a cloud storage container (CDN).
 
-NOTE: This is not usable yet. It's very close but it's still just a prototype.
+NOTE: This is still alpha quality software. You will probably experience some flakiness.
 
 
 Requirements

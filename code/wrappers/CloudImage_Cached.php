@@ -99,6 +99,6 @@ class CloudImage_Cached extends CloudImage
 	 * @return string
 	 */
 	private function cloudCacheKey() {
-		return base64_encode($this->Filename);
+		return md5($this->Filename);
 	}
 }
