@@ -9,6 +9,13 @@ NOTE: This is not usable yet. It's very close but it's still just a prototype.
 Requirements
 ------------
 - Silverstripe 3.1+ (may work with 3.0, but hasn't been tested)
+- Rackspace php-opencloud (not listed as a requirement with composer in case other buckets are used)
+
+*NOTE:* You must install php-opencloud separately if you're using the Rackspace driver.
+
+```
+composer require rackspace/php-opencloud:dev-master
+```
 
 
 Example
@@ -26,9 +33,12 @@ CloudAssets:
       Type: RackspaceBucket
       BaseURL: 'http://yourcdnbaseurl.com/'
       Container: site-uploads
-      UserName: yourlogin
+      Region: ORD
+      Username: yourlogin
       ApiKey: yourkey
 ```
+
+You can map multiple folders in this way or just map the whole assets folder.
 
 
 How It Works
@@ -62,10 +72,9 @@ Scenarios Where This Won't Work
 
 TODO
 ----
-- Write test for cached image meta data when no cache is present
+- Implement Rackspace CloudFiles driver
 - Keep track of Image_Cached in a separate db table so it's better utilised in redundant
   environments.
-- Implement Rackspace CloudFiles driver
 - Option to leave the files in tact locally and only look at the timestamp. This would
   give MUCH wider compatibility.
 - I would love for someone to implement some other drivers - S3, Swift, Google, etc.

@@ -56,6 +56,7 @@ abstract class CloudBucket extends Object
 	 * @param array  $cfg
 	 */
 	public function __construct($path, array $cfg=array()) {
+		$this->config    = $cfg;
 		$this->localPath = $path;
 		$this->baseURL   = empty($cfg[self::BASE_URL]) ? (Director::baseURL() . $path) : $cfg[self::BASE_URL];
 		if (substr($this->localPath, -1) != '/') $this->localPath .= '/';
@@ -72,11 +73,22 @@ abstract class CloudBucket extends Object
 
 
 	/**
-	 * @param File $f
+	 * @param File|string $f - the string should be the Filename field of a File
 	 * @return string
 	 */
-	public function getLinkFor(File $f) {
-		return $this->baseURL . str_replace($this->localPath, '', $f->getFilename());
+	public function getLinkFor($f) {
+		return $this->baseURL . $this->getRelativeLinkFor($f);
+	}
+
+
+	/**
+	 * Returns the full path and filename, relative to the BaseURL
+	 * @param File|string $f
+	 * @return string
+	 */
+	public function getRelativeLinkFor($f) {
+		$fn = is_object($f) ? $f->getFilename() : $f;
+		return trim(str_replace($this->localPath, '', $fn), '/');
 	}
 
 
