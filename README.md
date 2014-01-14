@@ -55,9 +55,6 @@ How It Works
    truncated to the string 'CloudFile' (see CloudAssets.file_placeholder config).
 5. For files (image, etc) the wrapped class overrides Link, URL, etc to point to the
    CDN version of the file.
-6. For folders, the wrapped class doesn't do much, except that if you try to change the
-   name it throws an error. In the future we could cause it to actually rename all the
-   objects underneath it.
 
 This setup allows you to forgo mounting the cloud storage via s3fs, CloudFuse, etc but
 shouldn't require changes to the Silverstripe file subsystem.
