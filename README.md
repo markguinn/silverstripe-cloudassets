@@ -56,17 +56,18 @@ shouldn't require changes to the Silverstripe file subsystem.
 Scenarios Where This Won't Work
 -------------------------------
 - Modules or other contexts where files are accessed directly
+- Hosting with no writable storage. The assets folder does not need to be permanent
+  but it does need to be used. Session permanence should be enough, though maybe not ideal.
 
 
 TODO
 ----
+- Write test for cached image meta data when no cache is present
 - Keep track of Image_Cached in a separate db table so it's better utilised in redundant
   environments.
-- Write test for cached image meta data when no cache is present
 - Implement Rackspace CloudFiles driver
 - Option to leave the files in tact locally and only look at the timestamp. This would
   give MUCH wider compatibility.
-- Handle missing local file
 - I would love for someone to implement some other drivers - S3, Swift, Google, etc.
   It's very easy to implement drivers - just extend CloudBucket and implement a few
   methods.
@@ -77,7 +78,7 @@ Developer(s)
 - Mark Guinn <mark@adaircreative.com>
 
 Contributions welcome by pull request and/or bug report.
-Please follow Silverstripe code standards.
+Please follow Silverstripe code standards (tests would be nice).
 
 
 License (MIT)

@@ -11,23 +11,33 @@
  */
 class CloudFile extends File implements CloudAssetInterface
 {
-	function Link() {
+	public function Link() {
+		$this->createLocalIfNeeded();
 		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::Link();
 	}
 
-	function RelativeLink() {
+	public function RelativeLink() {
+		$this->createLocalIfNeeded();
 		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::RelativeLink();
 	}
 
-	function getURL() {
+	public function getURL() {
+		$this->createLocalIfNeeded();
 		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::getURL();
 	}
 
-	function getAbsoluteURL() {
+	public function getAbsoluteURL() {
+		$this->createLocalIfNeeded();
 		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::getAbsoluteURL();
 	}
 
-	function getAbsoluteSize() {
+	public function getAbsoluteSize() {
+		$this->createLocalIfNeeded();
 		return $this->CloudStatus == 'Live' ? $this->CloudSize : parent::getAbsoluteSize();
+	}
+
+	public function exists() {
+		$this->createLocalIfNeeded();
+		return parent::exists();
 	}
 }

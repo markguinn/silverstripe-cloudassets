@@ -26,6 +26,9 @@ class CloudImage_Cached extends CloudImage
 		parent::__construct(array(), $isSingleton);
 		$this->ID = -1;
 		$this->Filename = $filename;
+
+		// this covers the case where the image already exists in the cloud from a previous call
+		if (file_exists($this->getFullPath()) && $this->containsPlaceholder()) $this->CloudStatus = 'Live';
 	}
 
 	public function getRelativePath() {

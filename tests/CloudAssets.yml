@@ -8,6 +8,9 @@ Folder:
    folder1-subfolder1:
       Name: FileTest-folder1-subfolder1
       ParentID: =>Folder.folder1
+   folder1-subfolder2:
+      Name: FileTest-folder1-subfolder2
+      ParentID: =>Folder.folder1
 File:
    asdf:
       Filename: assets/FileTest.txt
@@ -28,6 +31,10 @@ File:
       Filename: assets/FileTest-folder1/File1.txt
       Name: File1.txt
       ParentID: =>Folder.folder1
+   file2-folder1:
+      Filename: assets/FileTest-folder1/FileTest-folder1-subfolder1/File2.txt
+      Name: File2.txt
+      ParentID: =>Folder.folder1-subfolder1
 
 Image:
    png:

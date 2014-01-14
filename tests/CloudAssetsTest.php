@@ -148,9 +148,78 @@ class CloudAssetsTest extends SapphireTest
 	}
 
 
-	// TODO: change ParentID
-	// TODO: rename folder
-	// TODO: local copy
+	function testChangeParentIdShouldRenameInCloud() {
+		CloudAssets::inst()->updateAllFiles();
+		$sub2       = $this->objFromFixture('Folder', 'folder1-subfolder2');
+		$file       = $this->objFromFixture('File', 'file2-folder1');
+		$oldName    = $file->getFilename();
+
+		$this->assertEquals('http://testcdn.com/FileTest-folder1-subfolder1/File2.txt', $file->Link());
+
+		$file->ParentID = $sub2->ID;
+		$file->write();
+		$newName    = $file->getFilename();
+
+		$this->assertEquals('http://testcdn.com/FileTest-folder1-subfolder2/File2.txt', $file->Link());
+		$this->assertEquals($newName, $file->getCloudBucket()->renames[$oldName]);
+	}
+
+
+	function testChangeFolderNameShouldRenameAllFiles() {
+		CloudAssets::inst()->updateAllFiles();
+		$sub1       = $this->objFromFixture('Folder', 'folder1-subfolder1');
+		$file       = $this->objFromFixture('File', 'file2-folder1');
+
+		$oldName    = $file->getFilename();
+		$this->assertEquals('http://testcdn.com/FileTest-folder1-subfolder1/File2.txt', $file->Link());
+
+		$sub1->Name = 'crazytown';
+		$sub1->write();
+
+		DataObject::flush_and_destroy_cache();
+		$file       = File::get()->byID($file->ID); // reload to pick up changes
+		$newName    = $file->getFilename();
+
+		$this->assertEquals('http://testcdn.com/crazytown/File2.txt', $file->Link());
+		$this->assertEquals($newName, $file->getCloudBucket()->renames[$oldName]);
+	}
+
+
+	function testLocalCopyShouldBeCreatedIfNotPresent() {
+		// GIVEN: the local file is not present but DB and Cloud versions are
+		CloudAssets::inst()->updateAllFiles();
+		$f1 = $this->objFromFixture('File', 'file1-folder1');
+		unlink($f1->getFullPath());
+
+		// local file should be restored when exists() is called
+		$this->assertTrue($f1->exists()); // NOTE: this is the necessary call
+		$this->assertFileExists($f1->getFullPath());
+		$this->assertTrue($f1->containsPlaceholder());
+	}
+
+
+	function testMetadataRestoredOnCachedImageIfNotPresent() {
+		CloudAssets::inst()->updateAllFiles();
+		$img = $this->objFromFixture('Image', 'png');
+		$resized = $img->SetWidth(10);
+		$this->assertEquals(10, $resized->getWidth());
+		$this->assertEquals(10, $resized->getHeight());
+
+		// this should wipe out the cloudmeta for the above
+		$cache = SS_Cache::factory('CloudImage');
+		$cache->clean();
+
+		// this should generate a fresh cached image object (with no stored meta data)
+		$resized2 = $img->SetWidth(10);
+
+		// this call should then require it to fetch the cloud version to restore the meta data
+		$this->assertEquals(10, $resized2->getWidth());
+		$this->assertEquals(10, $resized2->getHeight());
+	}
+
+
+	// TODO: local copy mode
+
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

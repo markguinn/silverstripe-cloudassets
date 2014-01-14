@@ -11,24 +11,34 @@
  */
 class CloudImage extends Image implements CloudAssetInterface
 {
-	function Link() {
+	public function Link() {
+		$this->createLocalIfNeeded();
 		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::Link();
 	}
 
-	function RelativeLink() {
+	public function RelativeLink() {
+		$this->createLocalIfNeeded();
 		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::RelativeLink();
 	}
 
-	function getURL() {
+	public function getURL() {
+		$this->createLocalIfNeeded();
 		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::getURL();
 	}
 
-	function getAbsoluteURL() {
+	public function getAbsoluteURL() {
+		$this->createLocalIfNeeded();
 		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::getAbsoluteURL();
 	}
 
-	function getAbsoluteSize() {
+	public function getAbsoluteSize() {
+		$this->createLocalIfNeeded();
 		return $this->CloudStatus == 'Live' ? $this->CloudSize : parent::getAbsoluteSize();
+	}
+
+	public function exists() {
+		$this->createLocalIfNeeded();
+		return parent::exists();
 	}
 
 
@@ -52,6 +62,12 @@ class CloudImage extends Image implements CloudAssetInterface
 		// otherwise we need to resort to stored dimensions because the
 		// file may be in the cloud and the local may be a placeholder
 		$val = $this->getCloudMeta('Dimensions');
+		if (empty($val)) {
+			$this->downloadFromCloud();
+			$val = parent::getDimensions('string');
+			$this->convertToPlaceholder();
+		}
+
 		if ($dim === 'string') return $val;
 
 		$val = explode('x', $val);

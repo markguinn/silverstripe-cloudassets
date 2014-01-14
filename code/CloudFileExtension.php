@@ -216,4 +216,15 @@ class CloudFileExtension extends DataExtension
 		}
 	}
 
+
+	/**
+	 * If the file is present in the database and the cloud but not
+	 * locally, create a placeholder for it. This can happen in a lot
+	 * of cases such as load balanced servers and local development.
+	 */
+	public function createLocalIfNeeded() {
+		if ($this->owner->CloudStatus === 'Live' && !file_exists($this->owner->getFullPath())) {
+			$this->convertToPlaceholder();
+		}
+	}
 }
