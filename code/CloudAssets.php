@@ -11,6 +11,9 @@ class CloudAssets extends Object
 	/** @var bool - kill switch via config - if true the module will ignore all cloud buckets */
 	private static $disabled = false;
 
+	/** @var bool - kill switch for uploading local changes to the cdn - useful for safeguarding local development environments */
+	private static $uploads_disabled = false;
+
 	/** @var array */
 	private static $map = array(
 		//'assets/folder/path' => array(
@@ -93,4 +96,11 @@ class CloudAssets extends Object
 		return null;
 	}
 
+
+	/**
+	 * Wipes out any buckets we've saved
+	 */
+	public function clearBucketCache() {
+		$this->bucketCache = array();
+	}
 }

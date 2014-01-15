@@ -89,7 +89,7 @@ class CloudFileExtension extends DataExtension
 				}
 
 				// does this file need to be uploaded to storage
-				if ($wrapped->canBeInCloud() && !$wrapped->containsPlaceholder()) {
+				if ($wrapped->canBeInCloud() && !$wrapped->containsPlaceholder() && !Config::inst()->get('CloudAssets', 'uploads_disabled')) {
 					try {
 						if ($wrapped->hasMethod('onBeforeCloudPut')) $wrapped->onBeforeCloudPut();
 						$bucket->put($wrapped);

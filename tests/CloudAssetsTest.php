@@ -93,6 +93,7 @@ class CloudAssetsTest extends SapphireTest
 
 		$f1->Name = 'Newname1.txt';
 		$f1->write();
+		$this->assertFalse(file_exists($oldPath));
 		$newPath = $f1->getFullPath();
 		$newURL = $f1->getCloudURL();
 		$newName = $f1->getFilename();
@@ -137,7 +138,7 @@ class CloudAssetsTest extends SapphireTest
 		$countAfter = File::get()->count();
 		$this->assertEquals(10, $resized->getWidth());
 		$this->assertEquals(10, $resized->getHeight());
-		$this->assertEquals('http://testcdn.com/_resampled/SetWidth10-test-png32.png', $resized->Link());
+		$this->assertEquals('http://testcdn.com/' . $resized->getCloudBucket()->getRelativeLinkFor($resized), $resized->Link());
 		$this->assertEquals($countBefore, $countAfter, 'SetWidth should not create a database record');
 		$bucket = $resized->getCloudBucket();
 		$this->assertTrue(in_array($resized, $bucket->uploads), 'mock bucket should have recorded an upload');
@@ -218,6 +219,25 @@ class CloudAssetsTest extends SapphireTest
 	}
 
 
+	function testUploadsDisabled() {
+		Config::inst()->update('CloudAssets', 'uploads_disabled', true);
+
+		// this is needed to undo the upload done during setup
+		$f1 = $this->objFromFixture('File', 'file1-folder1');
+		if ($f1->CloudStatus != 'Local') {
+			$f1->CloudStatus = 'Local';
+			$f1->downloadFromCloud();
+			$f1->write();
+		}
+
+		CloudAssets::inst()->updateAllFiles();
+		DataObject::flush_and_destroy_cache();
+		$f1 = File::get()->byID($f1->ID);
+		$this->assertEquals('Local', $f1->CloudStatus);
+		$this->assertEquals(0, count($f1->getCloudBucket()->uploads));
+	}
+
+
 	// TODO: local copy mode
 
 
@@ -226,6 +246,7 @@ class CloudAssetsTest extends SapphireTest
 
 	public function setUpOnce() {
 		parent::setUpOnce();
+		Config::inst()->remove('CloudAssets', 'map');
 		Config::inst()->update('CloudAssets', 'map', array(
 			'assets/FileTest-folder1'   => array(
 				'BaseURL'   => 'http://testcdn.com/',
@@ -236,6 +257,8 @@ class CloudAssetsTest extends SapphireTest
 
 	public function setUp() {
 		parent::setUp();
+		Config::inst()->update('CloudAssets', 'disabled', false);
+		Config::inst()->update('CloudAssets', 'uploads_disabled', false);
 
 		if(!file_exists(ASSETS_PATH)) mkdir(ASSETS_PATH);
 
@@ -270,6 +293,8 @@ class CloudAssetsTest extends SapphireTest
 		$dest = ASSETS_PATH . '/FileTest-folder1/test-png32.png';
 		$f = copy($src, $dest);
 		if (!$f) die('unable to copy $src to $dest');
+
+		CloudAssets::inst()->clearBucketCache();
 	}
 
 	public function tearDown() {
