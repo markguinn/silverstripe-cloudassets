@@ -23,6 +23,7 @@ class UpdateCloudAssetsTask extends BuildTask
 			foreach ($files as $f) {
 				echo " - {$f->Filename}: {$f->CloudStatus} - placeholder={$f->containsPlaceholder()}\n";
 				$f->updateCloudStatus();
+				$this->createLocalIfNeeded();
 			}
 		}
 
