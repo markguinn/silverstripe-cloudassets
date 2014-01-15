@@ -1,5 +1,6 @@
 Cloud Assets Module
 ===================
+[![Build Status](https://secure.travis-ci.org/burnbright/silverstripe-shop.png?branch=1.0)](http://travis-ci.org/burnbright/silverstripe-shop)
 
 Allows you to host all or part of the assets folder on a cloud storage container (CDN).
 
