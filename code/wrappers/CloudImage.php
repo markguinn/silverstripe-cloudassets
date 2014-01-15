@@ -55,17 +55,22 @@ class CloudImage extends Image implements CloudAssetInterface
 	 * @return int|string
 	 */
 	function getDimensions($dim = "string") {
-		// give an option to get the real dimensions
-		if ($dim === 'live') return parent::getDimensions();
-		if ($this->CloudStatus != 'Live') return parent::getDimensions($dim);
+		$val = '1x1';
+		try {
+			// give an option to get the real dimensions
+			if ($dim === 'live') return parent::getDimensions();
+			if ($this->CloudStatus != 'Live') return parent::getDimensions($dim);
 
-		// otherwise we need to resort to stored dimensions because the
-		// file may be in the cloud and the local may be a placeholder
-		$val = $this->getCloudMeta('Dimensions');
-		if (empty($val)) {
-			$this->downloadFromCloud();
-			$val = parent::getDimensions('string');
-			$this->convertToPlaceholder();
+			// otherwise we need to resort to stored dimensions because the
+			// file may be in the cloud and the local may be a placeholder
+			$val = $this->getCloudMeta('Dimensions');
+			if (empty($val)) {
+				$this->downloadFromCloud();
+				$val = parent::getDimensions('string');
+				$this->convertToPlaceholder();
+			}
+		} catch (Exception $e) {
+			// TODO: log this
 		}
 
 		if ($dim === 'string') return $val;
