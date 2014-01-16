@@ -1,6 +1,6 @@
 Cloud Assets Module
 ===================
-[![Build Status](https://secure.travis-ci.org/markguinn/silverstripe-cloudassets.png?branch=master)](http://travis-ci.org/markguinn/silverstripe-cloudassets)
+[![Build Status](https://travis-ci.org/markguinn/silverstripe-cloudassets.png)](http://travis-ci.org/markguinn/silverstripe-cloudassets)
 
 Allows you to host all or part of the assets folder on a cloud storage container (CDN).
 
