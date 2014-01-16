@@ -211,8 +211,12 @@ class CloudFileExtension extends DataExtension
 	public function downloadFromCloud() {
 		if ($this->owner->CloudStatus === 'Live') {
 			$bucket   = $this->owner->getCloudBucket();
-			$contents = $bucket->getContents($this->owner);
-			file_put_contents($this->owner->getFullPath(), $contents);
+			if ($bucket) {
+				$contents = $bucket->getContents($this->owner);
+				// if there was an error and we overwrote the local file with empty or null, it could delete the remote
+				// file as well. Better to err on the side of not writing locally when we should than that.
+				if (!empty($contents)) file_put_contents($this->owner->getFullPath(), $contents);
+			}
 		}
 	}
 
