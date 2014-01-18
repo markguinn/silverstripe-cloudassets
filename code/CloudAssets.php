@@ -19,6 +19,7 @@ class CloudAssets extends Object
 		//'assets/folder/path' => array(
 		//  'Type'      => 'RackspaceBucket',
 		//  'BaseURL'   => 'http://cdnurl.com/',
+		//  'SecureURL' => 'https://cdnurl.com/',
 		//  'Container' => 'container-name',
 		//  'UserID'    => 'username',
 		//  'ApiKey'    => 'key',
@@ -26,10 +27,13 @@ class CloudAssets extends Object
 		//);
 	);
 
+	/** @var array - merged in with all bucket configs */
+	private static $defaults = array();
+
 	/** @var array - add to this if you have other file subclasses floating around */
 	private static $wrappers = array(
-		'File'          => 'CloudFile',
-		'Image'         => 'CloudImage',
+		'File'              => 'CloudFile',
+		'Image'             => 'CloudImage',
 		'CloudImage_Cached' => 'CloudImage_Cached', // this is awkward but prevents it from trying to transform Image_Cached
 	);
 
@@ -61,6 +65,11 @@ class CloudAssets extends Object
 			if (empty($cfg[ CloudBucket::TYPE ])) continue;
 			if (strpos($filename, $path) === 0) {
 				if (!isset($this->bucketCache[$path])) {
+					// merge in default config if needed
+					$defaults = Config::inst()->get('CloudAssets', 'defaults');
+					if (!empty($defaults) && is_array($defaults)) $cfg = array_merge($defaults, $cfg);
+
+					// instantiate the bucket
 					$this->bucketCache[$path] = Injector::inst()->create($cfg[CloudBucket::TYPE], $path, $cfg);
 				}
 

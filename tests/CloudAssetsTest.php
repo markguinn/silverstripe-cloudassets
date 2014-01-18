@@ -238,6 +238,25 @@ class CloudAssetsTest extends SapphireTest
 	}
 
 
+	// I know it's not strictly good practice but these are two small features and
+	// it's easy enough to just test them at the same time.
+	function testGlobalConfigAndSecureURL() {
+		CloudAssets::inst()->updateAllFiles();
+		$f1 = $this->objFromFixture('File', 'file1-folder1');
+		$this->assertEquals('http://testcdn.com/File1.txt', $f1->Link());
+
+		Config::inst()->update('CloudAssets', 'defaults', array(
+			'SecureURL'     => 'https://testcdn.com',
+			'BaseURL'       => 'http://shouldbeoverridden.com',
+		));
+
+		CloudAssets::inst()->clearBucketCache();
+		$this->assertEquals('http://testcdn.com/File1.txt', $f1->Link());
+		Config::inst()->update('Director', 'alternate_protocol', 'https');
+		$this->assertEquals('https://testcdn.com/File1.txt', $f1->Link());
+	}
+
+
 	// TODO: local copy mode
 
 
