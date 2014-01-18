@@ -9,6 +9,7 @@
 abstract class CloudBucket extends Object
 {
 	const BASE_URL   = 'BaseURL';
+	const SECURE_URL = 'SecureURL';
 	const LOCAL_COPY = 'LocalCopy';
 	const TYPE       = 'Type';
 
@@ -17,6 +18,9 @@ abstract class CloudBucket extends Object
 
 	/** @var string $baseURL - CDN url */
 	protected $baseURL;
+
+	/** @var  string $secureURL - CDN url for https (optional) */
+	protected $secureURL;
 
 	/** @var  array $config */
 	protected $config;
@@ -59,8 +63,10 @@ abstract class CloudBucket extends Object
 		$this->config    = $cfg;
 		$this->localPath = $path;
 		$this->baseURL   = empty($cfg[self::BASE_URL]) ? (Director::baseURL() . $path) : $cfg[self::BASE_URL];
+		$this->secureURL = empty($cfg[self::SECURE_URL]) ? '' : $cfg[self::SECURE_URL];
 		if (substr($this->localPath, -1) != '/') $this->localPath .= '/';
 		if (substr($this->baseURL, -1) != '/') $this->baseURL .= '/';
+		if (!empty($this->secureURL) && substr($this->secureURL, -1) != '/') $this->secureURL .= '/';
 	}
 
 
@@ -73,11 +79,20 @@ abstract class CloudBucket extends Object
 
 
 	/**
+	 * @return string
+	 */
+	public function getSecureURL() {
+		return $this->secureURL;
+	}
+
+
+	/**
 	 * @param File|string $f - the string should be the Filename field of a File
 	 * @return string
 	 */
 	public function getLinkFor($f) {
-		return $this->baseURL . $this->getRelativeLinkFor($f);
+		$base = Director::is_https() && !empty($this->secureURL) ? $this->secureURL : $this->baseURL;
+		return $base . $this->getRelativeLinkFor($f);
 	}
 
 
