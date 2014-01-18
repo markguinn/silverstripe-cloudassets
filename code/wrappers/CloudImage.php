@@ -121,6 +121,17 @@ class CloudImage extends Image implements CloudAssetInterface
 
 	/**
 	 * Remove all of the formatted cached images for this image.
+	 * This is an annoying problem I can't think of a better solution for.
+	 * Below is the 3.1 version of this function copied from Image.
+	 * There is no hook in this function that would allow us to know
+	 * what remote files to delete.
+	 * In 3.2, this function and the encoding method for these files
+	 * totally changed to a base64+json encoding of the arguments.
+	 * Unfortunately, there is still no hook we can use and the other
+	 * methods involved are private instead of protected.
+	 * As a result, I've had to widen the regex. Hopefully that won't
+	 * do any damage. It's more hacky and fragile than I'd prefer, though.
+	 * MG 1.18.14
 	 *
 	 * @return int The number of formatted images deleted
 	 */
@@ -154,9 +165,10 @@ class CloudImage extends Image implements CloudAssetInterface
 				$generateFuncs[] = preg_quote($format);
 			}
 		}
+
 		// All generate functions may appear any number of times in the image cache name.
 		$generateFuncs = implode('|', $generateFuncs);
-		$pattern = "/^(({$generateFuncs})\d+\-)+" . preg_quote($this->Name) . "$/i";
+		$pattern = "/^(({$generateFuncs})(?:[a-zA-Z0-9\\/\r\n=]+)\\-)+" . preg_quote($this->Name) . "$/i";
 
 		foreach($cachedFiles as $cfile) {
 			if(preg_match($pattern, $cfile)) {

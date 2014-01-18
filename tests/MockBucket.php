@@ -18,8 +18,8 @@ class MockBucket extends CloudBucket
 	 * @param File $f
 	 */
 	public function put(File $f) {
-		$this->uploads[] = $f;
-		$this->uploadContents[ $f->getFilename() ] = file_get_contents($f->getFullPath());
+		$this->uploads[] = $f->Filename;
+		$this->uploadContents[ $f->Filename ] = file_get_contents($f->getFullPath());
 	}
 
 
@@ -27,7 +27,7 @@ class MockBucket extends CloudBucket
 	 * @param File|string $f
 	 */
 	public function delete($f) {
-		$this->deletes[] = $f;
+		$this->deletes[] = is_object($f) ? $f->Filename : $f;
 	}
 
 
@@ -46,6 +46,36 @@ class MockBucket extends CloudBucket
 	 * @return string
 	 */
 	public function getContents(File $f) {
-		return isset($this->uploadContents[$f->getFilename()]) ? $this->uploadContents[$f->getFilename()] : null;
+		return isset($this->uploadContents[$f->Filename]) ? $this->uploadContents[$f->Filename] : null;
 	}
+
+
+	/**
+	 * @param string|File $f
+	 * @return bool
+	 */
+	public function wasDeleted($f) {
+		return in_array(is_object($f) ? $f->Filename : $f, $this->deletes);
+	}
+
+
+	/**
+	 * @param string|File $f
+	 * @return bool
+	 */
+	public function wasUploaded($f) {
+		return in_array(is_object($f) ? $f->Filename : $f, $this->uploads);
+	}
+
+
+	/**
+	 * @param string|File $newName
+	 * @param string $oldName
+	 * @return bool
+	 */
+	public function wasRenamed($newName, $oldName) {
+		if (is_object($newName)) $newName = $newName->Filename;
+		return $newName == $this->renames[$oldName];
+	}
+
 }

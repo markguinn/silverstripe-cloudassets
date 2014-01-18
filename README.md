@@ -9,7 +9,7 @@ NOTE: This is still alpha quality software. You will probably experience some fl
 
 Requirements
 ------------
-- Silverstripe 3.1 (tests are currently failing against master branch, 3.0 has not yet been tested)
+- Silverstripe 3.0+ (tested again 3.0, 3.1, and master)
 - Rackspace php-opencloud (not listed as a requirement with composer in case other buckets are used)
 
 *NOTE:* You must install php-opencloud separately if you're using the Rackspace driver.

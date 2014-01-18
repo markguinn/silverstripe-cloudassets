@@ -61,7 +61,7 @@ class CloudAssetsTest extends SapphireTest
 		$this->assertEquals($placeholder, file_get_contents($f1->getFullPath()), 'should contain the placeholder after updating status');
 
 		$bucket = CloudAssets::inst()->map($f1);
-		$this->assertTrue(in_array($f1, $bucket->uploads), 'mock bucket should have recorded an upload');
+		$this->assertTrue($bucket->wasUploaded($f1), 'mock bucket should have recorded an upload');
 	}
 
 
@@ -70,7 +70,7 @@ class CloudAssetsTest extends SapphireTest
 		$f1 = $this->objFromFixture('File', 'file1-folder1');
 		$f1->delete();
 		$this->assertFalse(file_exists($f1->getFullPath()), 'local file should not exist');
-		$this->assertTrue(in_array($f1, $f1->getCloudBucket()->deletes), 'remote file should have been deleted');
+		$this->assertTrue($f1->getCloudBucket()->wasDeleted($f1), 'remote file should have been deleted');
 	}
 
 
@@ -102,7 +102,7 @@ class CloudAssetsTest extends SapphireTest
 		$this->assertTrue(file_exists($newPath));
 		$this->assertNotEquals($oldPath, $newPath);
 		$this->assertNotEquals($oldURL, $newURL);
-		$this->assertEquals($newName, $f1->getCloudBucket()->renames[$oldName]);
+		$this->assertTrue($f1->getCloudBucket()->wasRenamed($newName, $oldName));
 	}
 
 
@@ -141,11 +141,11 @@ class CloudAssetsTest extends SapphireTest
 		$this->assertEquals('http://testcdn.com/' . $resized->getCloudBucket()->getRelativeLinkFor($resized), $resized->Link());
 		$this->assertEquals($countBefore, $countAfter, 'SetWidth should not create a database record');
 		$bucket = $resized->getCloudBucket();
-		$this->assertTrue(in_array($resized, $bucket->uploads), 'mock bucket should have recorded an upload');
+		$this->assertTrue($bucket->wasUploaded($resized), 'mock bucket should have recorded an upload');
 
 		// deleting the image should also delete the resize
 		$img->delete();
-		$this->assertTrue(in_array($resized->Filename, $bucket->deletes), 'mock bucket should have recorded a delete');
+		$this->assertTrue($bucket->wasDeleted($resized), 'mock bucket should have recorded a delete');
 	}
 
 
@@ -162,7 +162,7 @@ class CloudAssetsTest extends SapphireTest
 		$newName    = $file->getFilename();
 
 		$this->assertEquals('http://testcdn.com/FileTest-folder1-subfolder2/File2.txt', $file->Link());
-		$this->assertEquals($newName, $file->getCloudBucket()->renames[$oldName]);
+		$this->assertTrue($file->getCloudBucket()->wasRenamed($newName, $oldName));
 	}
 
 
@@ -182,7 +182,7 @@ class CloudAssetsTest extends SapphireTest
 		$newName    = $file->getFilename();
 
 		$this->assertEquals('http://testcdn.com/crazytown/File2.txt', $file->Link());
-		$this->assertEquals($newName, $file->getCloudBucket()->renames[$oldName]);
+		$this->assertTrue($file->getCloudBucket()->wasRenamed($newName, $oldName));
 	}
 
 
