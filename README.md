@@ -47,13 +47,13 @@ How It Works
 1. CloudFileExtension is added to File.
 2. In onAfterWrite, this extension checks if anything needs to be synced to the cloud
    or changed to a wrapped class.
-3. File, Folder, and Image records are converted at that stage to the corresponding
+3. File and Image records are converted at that stage to the corresponding
    wrapped versions. Additional wrapper classes can be added (if you have other
-   subclasses of File) via CloudAssets.wrappers. Note that any subclass that is
+   subclasses of File) via `CloudAssets.wrappers`. Note that any subclass that is
    not wrapped will continue to function normally and will not use the cloud.
 4. Once wrapped, the file length will be checked every onAfterWrite. If the file on
    disk has been replaced it will be uploaded to the cloud storage and the local version
-   truncated to the string 'CloudFile' (see CloudAssets.file_placeholder config).
+   truncated to the string 'CloudFile' (see `CloudAssets.file_placeholder` config).
 5. For files (image, etc) the wrapped class overrides Link, URL, etc to point to the
    CDN version of the file.
 
