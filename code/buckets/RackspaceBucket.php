@@ -11,10 +11,11 @@ use OpenCloud\Rackspace;
 
 class RackspaceBucket extends CloudBucket
 {
-	const CONTAINER = 'Container';
-	const REGION    = 'Region';
-	const USERNAME  = 'Username';
-	const API_KEY   = 'ApiKey';
+	const CONTAINER   = 'Container';
+	const REGION      = 'Region';
+	const USERNAME    = 'Username';
+	const API_KEY     = 'ApiKey';
+	const SERVICE_NET = 'ServiceNet';
 
 	/** @var \OpenCloud\ObjectStore\Resource\Container */
 	protected $container;
@@ -40,7 +41,8 @@ class RackspaceBucket extends CloudBucket
 			'apiKey'        => $cfg[self::API_KEY],
 		));
 
-		$service = $client->objectStoreService('cloudFiles', $cfg[self::REGION]);
+		$service = $client->objectStoreService('cloudFiles', $cfg[self::REGION],
+			empty($cfg[self::SERVICE_NET]) ? 'publicURL' : 'internalURL');
 
 		$this->containerName = $cfg[self::CONTAINER];
 		$this->container = $service->getContainer($this->containerName);
