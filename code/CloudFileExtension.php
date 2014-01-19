@@ -265,4 +265,14 @@ class CloudFileExtension extends DataExtension
 
 		return false;
 	}
+
+
+	/**
+	 * Returns true if the local file is not available
+	 * @return bool
+	 */
+	public function isLocalMissing() {
+		return !file_exists($this->owner->getFullPath()) || $this->containsPlaceholder();
+	}
+
 }

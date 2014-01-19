@@ -91,8 +91,22 @@ class CloudImage extends Image implements CloudAssetInterface
 		if($this->ID && $this->Filename && Director::fileExists($this->Filename)) {
 			$cacheFile = call_user_func_array(array($this, "cacheFilename"), $args);
 
-			if(!file_exists(Director::baseFolder()."/".$cacheFile) || isset($_GET['flush'])) {
-				if ($this->CloudStatus === 'Live' && $this->containsPlaceholder()) {
+			if (isset($_GET['flush'])) {
+				$this->downloadFromCloud();
+
+				// There was a bug here caused by the fact that GDBackend tries
+				// to read the size off the cached image, which would be a placeholder
+				// in certain cases.
+				// I'm not 100% sure what the correct behaviour is here. For now
+				// we'll destroy the existing image, causing it to be re-uploaded
+				// every time. That seems safer if a little bit wasteful.
+				$fn = Director::baseFolder()."/".$cacheFile;
+				if (file_exists($fn)) unlink($fn);
+
+				call_user_func_array(array($this, "generateFormattedImage"), $args);
+				$this->convertToPlaceholder();
+			} elseif (!file_exists(Director::baseFolder()."/".$cacheFile)) {
+				if ($this->CloudStatus === 'Live' && $this->isLocalMissing()) {
 					$this->downloadFromCloud();
 					call_user_func_array(array($this, "generateFormattedImage"), $args);
 					$this->convertToPlaceholder();
