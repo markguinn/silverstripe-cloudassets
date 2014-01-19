@@ -235,6 +235,7 @@ class CloudAssetsLocalCopyTest extends SapphireTest
 		parent::setUp();
 		Config::inst()->update('CloudAssets', 'disabled', false);
 		Config::inst()->update('CloudAssets', 'uploads_disabled', false);
+		Config::inst()->update('Director', 'alternate_protocol', 'http');
 
 		if(!file_exists(ASSETS_PATH)) mkdir(ASSETS_PATH);
 
