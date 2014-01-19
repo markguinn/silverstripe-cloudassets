@@ -1,55 +1,14 @@
 <?php
 /**
- * 
+ * Basically runs the same suite of tests, but with local copy enabled
  *
  * @author Mark Guinn <mark@adaircreative.com>
  * @date 01.10.2014
  * @package cloudassets
  */
-class CloudAssetsTest extends SapphireTest
+class CloudAssetsLocalCopyTest extends SapphireTest
 {
 	protected static $fixture_file = 'CloudAssets.yml';
-
-	function testMap() {
-		$bucket = CloudAssets::inst()->map('assets/FileTest-folder1/File1.txt');
-		$this->assertTrue($bucket instanceof MockBucket);
-		$this->assertEquals('http://testcdn.com/', $bucket->getBaseURL());
-	}
-
-
-	function testWrap() {
-		$f1 = $this->objFromFixture('File', 'file1-folder1');
-		$f2 = $this->objFromFixture('File', 'asdf');
-		$this->assertTrue($f1->hasExtension('CloudFileExtension'));
-
-		// NOTE: we're having to call updateCloudStatus here in the tests
-		// because the files weren't present when the objects were created
-		// due to the order of setup in tests. Turns out it's handy for
-		// testing because we can test before and after states.
-		$f1->updateCloudStatus();
-		$this->assertEquals('CloudFile', $f1->ClassName);
-
-		$f2->updateCloudStatus();
-		$this->assertEquals('File', $f2->ClassName);
-	}
-
-
-	function testLinks() {
-		CloudAssets::inst()->updateAllFiles();
-
-		$f1 = $this->objFromFixture('File', 'file1-folder1');
-		$this->assertEquals('http://testcdn.com/File1.txt', $f1->Link());
-		$this->assertEquals('http://testcdn.com/File1.txt', $f1->RelativeLink());
-		$this->assertEquals('http://testcdn.com/File1.txt', $f1->getURL());
-		$this->assertEquals('http://testcdn.com/File1.txt', $f1->getAbsoluteURL());
-		// there may be more methods we need to test here?
-
-		$f2 = $this->objFromFixture('File', 'asdf');
-		$this->assertEquals('/assets/FileTest.txt', $f2->Link());
-		$this->assertEquals('assets/FileTest.txt', $f2->RelativeLink());
-		$this->assertEquals('/assets/FileTest.txt', $f2->getURL());
-		$this->assertEquals(Director::absoluteBaseURL() . 'assets/FileTest.txt', $f2->getAbsoluteURL());
-	}
 
 
 	function testUpload() {
@@ -57,8 +16,7 @@ class CloudAssetsTest extends SapphireTest
 		$this->assertEquals(1000, filesize($f1->getFullPath()), 'should initially contain 1000 bytes');
 
 		$f1 = $f1->updateCloudStatus();
-		$placeholder = Config::inst()->get('CloudAssets', 'file_placeholder');
-		$this->assertEquals($placeholder, file_get_contents($f1->getFullPath()), 'should contain the placeholder after updating status');
+		$this->assertEquals(1000, filesize($f1->getFullPath()), 'should still contain 1000 bytes');
 
 		$bucket = CloudAssets::inst()->map($f1);
 		$this->assertTrue($bucket->wasUploaded($f1), 'mock bucket should have recorded an upload');
@@ -77,8 +35,8 @@ class CloudAssetsTest extends SapphireTest
 	function testFileSize() {
 		CloudAssets::inst()->updateAllFiles();
 		$f1 = $this->objFromFixture('File', 'file1-folder1');
-		$placeholder = Config::inst()->get('CloudAssets', 'file_placeholder');
-		$this->assertEquals($placeholder, file_get_contents($f1->getFullPath()), 'should contain the placeholder');
+		//$placeholder = Config::inst()->get('CloudAssets', 'file_placeholder');
+		//$this->assertEquals($placeholder, file_get_contents($f1->getFullPath()), 'should contain the placeholder');
 		$this->assertEquals(1000, $f1->getAbsoluteSize(), 'should still report the cloud size');
 		$this->assertEquals('1000 bytes', $f1->getSize(), 'formatted size should work too');
 	}
@@ -195,7 +153,8 @@ class CloudAssetsTest extends SapphireTest
 		// local file should be restored when exists() is called
 		$this->assertTrue($f1->exists()); // NOTE: this is the necessary call
 		$this->assertFileExists($f1->getFullPath());
-		$this->assertTrue($f1->containsPlaceholder());
+		$this->assertFalse($f1->containsPlaceholder());
+		$this->assertEquals(1000, filesize($f1->getFullPath()), 'should still contain 1000 bytes');
 	}
 
 
@@ -267,7 +226,7 @@ class CloudAssetsTest extends SapphireTest
 			'assets/FileTest-folder1'   => array(
 				'BaseURL'   => 'http://testcdn.com/',
 				'Type'      => 'MockBucket',
-				'LocalCopy' => false,
+				'LocalCopy' => true,
 			),
 		));
 	}

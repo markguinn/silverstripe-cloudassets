@@ -94,6 +94,7 @@ class CloudFileExtension extends DataExtension
 						if ($wrapped->hasMethod('onBeforeCloudPut')) $wrapped->onBeforeCloudPut();
 						$bucket->put($wrapped);
 
+						$wrapped->setCloudMeta('LastPut', time());
 						$wrapped->CloudStatus = 'Live';
 						$wrapped->CloudSize   = filesize($this->owner->getFullPath());
 						$wrapped->write();
@@ -148,7 +149,11 @@ class CloudFileExtension extends DataExtension
 	 * Wipes out the contents of this file and replaces with placeholder text
 	 */
 	public function convertToPlaceholder() {
-		file_put_contents($this->owner->getFullPath(), Config::inst()->get('CloudAssets', 'file_placeholder'));
+		$bucket = $this->getCloudBucket();
+		if ($bucket && !$bucket->isLocalCopyEnabled()) {
+			file_put_contents($this->owner->getFullPath(), Config::inst()->get('CloudAssets', 'file_placeholder'));
+		}
+
 		return $this->owner;
 	}
 
@@ -227,8 +232,37 @@ class CloudFileExtension extends DataExtension
 	 * of cases such as load balanced servers and local development.
 	 */
 	public function createLocalIfNeeded() {
-		if ($this->owner->CloudStatus === 'Live' && !file_exists($this->owner->getFullPath())) {
-			$this->convertToPlaceholder();
+		if ($this->owner->CloudStatus === 'Live') {
+			if ($this->getCloudBucket()->isLocalCopyEnabled()) {
+				if (!file_exists($this->owner->getFullPath()) || $this->containsPlaceholder()) {
+					$this->downloadFromCloud();
+				}
+			} else {
+				if (!file_exists($this->owner->getFullPath())) $this->convertToPlaceholder();
+			}
 		}
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isCloudPutNeeded() {
+		// we never want to upload the placeholder
+		if ($this->containsPlaceholder()) return false;
+
+		// we never want to upload an empty file
+		$path = $this->owner->getFullPath();
+		if (!file_exists($path)) return false;
+
+		// we always want to upload if it's the first time
+		$lastPut = $this->getCloudMeta('LastPut');
+		if (!$lastPut) return true;
+
+		// additionally, we want to upload if the file has been changed or replaced
+		$mtime = filemtime($path);
+		if ($mtime > $lastPut) return true;
+
+		return false;
 	}
 }

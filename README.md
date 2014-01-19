@@ -37,6 +37,7 @@ CloudAssets:
       Region: ORD
       Username: yourlogin
       ApiKey: yourkey
+      LocalCopy: false
 ```
 
 You can map multiple folders in this way or just map the whole assets folder.
@@ -54,6 +55,9 @@ How It Works
 4. Once wrapped, the file length will be checked every onAfterWrite. If the file on
    disk has been replaced it will be uploaded to the cloud storage and the local version
    truncated to the string 'CloudFile' (see `CloudAssets.file_placeholder` config).
+   NOTE: this behaviour can be changed with the LocalCopy key in the bucket config.
+   If that is true, the file will be kept in tact locally and the modification time
+   will be used to keep the cloud version in sync.
 5. For files (image, etc) the wrapped class overrides Link, URL, etc to point to the
    CDN version of the file.
 
@@ -63,9 +67,9 @@ shouldn't require changes to the Silverstripe file subsystem.
 
 Scenarios Where This Won't Work
 -------------------------------
-- Modules or other contexts where files are accessed directly
 - Hosting with no writable storage. The assets folder does not need to be permanent
-  but it does need to be used. Session permanence should be enough, though maybe not ideal.
+  but it does need to be used. Per-request permanence should be enough, though maybe
+  not ideal.
 
 
 Developer(s)

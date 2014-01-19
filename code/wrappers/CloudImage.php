@@ -55,22 +55,17 @@ class CloudImage extends Image implements CloudAssetInterface
 	 * @return int|string
 	 */
 	function getDimensions($dim = "string") {
-		$val = '1x1';
-		try {
-			// give an option to get the real dimensions
-			if ($dim === 'live') return parent::getDimensions();
-			if ($this->CloudStatus != 'Live') return parent::getDimensions($dim);
+		// give an option to get the real dimensions
+		if ($dim === 'live') return parent::getDimensions();
+		if ($this->CloudStatus != 'Live') return parent::getDimensions($dim);
 
-			// otherwise we need to resort to stored dimensions because the
-			// file may be in the cloud and the local may be a placeholder
-			$val = $this->getCloudMeta('Dimensions');
-			if (empty($val)) {
-				$this->downloadFromCloud();
-				$val = parent::getDimensions('string');
-				$this->convertToPlaceholder();
-			}
-		} catch (Exception $e) {
-			// TODO: log this
+		// otherwise we need to resort to stored dimensions because the
+		// file may be in the cloud and the local may be a placeholder
+		$val = $this->getCloudMeta('Dimensions');
+		if (empty($val)) {
+			$this->downloadFromCloud();
+			$val = parent::getDimensions('string');
+			$this->convertToPlaceholder();
 		}
 
 		if ($dim === 'string') return $val;
@@ -131,6 +126,7 @@ class CloudImage extends Image implements CloudAssetInterface
 	 * methods involved are private instead of protected.
 	 * As a result, I've had to widen the regex. Hopefully that won't
 	 * do any damage. It's more hacky and fragile than I'd prefer, though.
+	 * NOTE: see issue #1 - once that's done we won't need to do this
 	 * MG 1.18.14
 	 *
 	 * @return int The number of formatted images deleted
