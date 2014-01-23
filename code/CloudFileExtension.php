@@ -59,7 +59,7 @@ class CloudFileExtension extends DataExtension
 				$bucket->delete($this->owner);
 			} catch(Exception $e) {
 				if (Director::isDev()) {
-					Debug::log("Failed bucket upload: " . $e->getMessage() . " for " . $wrapped->getFullPath());
+					Debug::log("Failed bucket delete: " . $e->getMessage() . " for " . $this->owner->getFullPath());
 				} else {
 					// Fail silently for now. This will cause the local copy to be served.
 				}

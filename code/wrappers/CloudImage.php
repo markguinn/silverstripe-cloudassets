@@ -186,7 +186,17 @@ class CloudImage extends Image implements CloudAssetInterface
 					unlink($cacheDir . $cfile);
 					$numDeleted++;
 
-					if ($bucket && $this->CloudStatus === 'Live') $bucket->delete($folder . '_resampled/' . $cfile);
+					if ($bucket && $this->CloudStatus === 'Live') {
+						try {
+							$bucket->delete($folder . '_resampled/' . $cfile);
+						} catch(Exception $e) {
+							if (Director::isDev()) {
+								Debug::log("Failed bucket delete: " . $e->getMessage() . " for " . $this->getFullPath());
+							} else {
+								// Fail silently for now. This will cause the local copy to be served.
+							}
+						}
+					}
 				}
 			}
 		}
