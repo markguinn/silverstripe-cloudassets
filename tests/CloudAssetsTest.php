@@ -257,6 +257,21 @@ class CloudAssetsTest extends SapphireTest
 	}
 
 
+	function testLocalFolderShouldBeCreatedIfNeeded() {
+		CloudAssets::inst()->updateAllFiles();
+		$f1 = $this->objFromFixture('File', 'file1-folder1');
+
+		// delete the file and folder
+		$parent = $f1->Parent();
+		system("rm -rf " . $parent->getFullPath());
+
+		// create local should create the folder as well
+		$f1->createLocalIfNeeded();
+		$this->assertFileExists($parent->getFullPath(), 'parent folder should exist');
+		$this->assertFileExists($f1->getFullPath(),     'file should exist');
+	}
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 

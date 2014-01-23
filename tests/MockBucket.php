@@ -12,7 +12,7 @@ class MockBucket extends CloudBucket
 	public $uploads = array();
 	public $deletes = array();
 	public $renames = array();
-	private $uploadContents = array();
+	public $uploadContents = array();
 
 	/**
 	 * @param File $f

@@ -159,7 +159,9 @@ class CloudFileExtension extends DataExtension
 	public function convertToPlaceholder() {
 		$bucket = $this->getCloudBucket();
 		if ($bucket && !$bucket->isLocalCopyEnabled()) {
-			file_put_contents($this->owner->getFullPath(), Config::inst()->get('CloudAssets', 'file_placeholder'));
+			$path = $this->owner->getFullPath();
+			Filesystem::makeFolder(dirname($path));
+			file_put_contents($path, Config::inst()->get('CloudAssets', 'file_placeholder'));
 		}
 
 		return $this->owner;
@@ -226,9 +228,11 @@ class CloudFileExtension extends DataExtension
 			$bucket   = $this->owner->getCloudBucket();
 			if ($bucket) {
 				$contents = $bucket->getContents($this->owner);
+				$path     = $this->owner->getFullPath();
+				Filesystem::makeFolder(dirname($path));
 				// if there was an error and we overwrote the local file with empty or null, it could delete the remote
 				// file as well. Better to err on the side of not writing locally when we should than that.
-				if (!empty($contents)) file_put_contents($this->owner->getFullPath(), $contents);
+				if (!empty($contents)) file_put_contents($path, $contents);
 			}
 		}
 	}
