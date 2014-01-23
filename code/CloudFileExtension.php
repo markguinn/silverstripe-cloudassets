@@ -55,7 +55,15 @@ class CloudFileExtension extends DataExtension
 		$bucket = CloudAssets::inst()->map($this->owner->getFilename());
 		if ($bucket) {
 			if ($this->owner->hasMethod('onBeforeCloudDelete')) $this->owner->onBeforeCloudDelete();
-			$bucket->delete($this->owner);
+			try {
+				$bucket->delete($this->owner);
+			} catch(Exception $e) {
+				if (Director::isDev()) {
+					Debug::log("Failed bucket upload: " . $e->getMessage() . " for " . $wrapped->getFullPath());
+				} else {
+					// Fail silently for now. This will cause the local copy to be served.
+				}
+			}
 			if ($this->owner->hasMethod('onAfterCloudDelete')) $this->owner->onAfterCloudDelete();
 		}
 	}
