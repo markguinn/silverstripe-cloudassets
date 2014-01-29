@@ -93,6 +93,19 @@ class RackspaceBucket extends CloudBucket
 
 
 	/**
+	 * This version just returns a normal link. I'm assuming most
+	 * buckets will implement this but I want it to be optional.
+	 * @param File|string $f
+	 * @param int $expires [optional] - Expiration time in seconds
+	 * @return string
+	 */
+	public function getTemporaryLinkFor($f, $expires=3600) {
+		$obj = $this->getFileObjectFor( $this->getRelativeLinkFor($f) );
+		return $obj->getTemporaryUrl($expires, 'GET');
+	}
+
+
+	/**
 	 * @param File|string $f
 	 * @return \OpenCloud\ObjectStore\Resource\DataObject
 	 */

@@ -97,6 +97,18 @@ abstract class CloudBucket extends Object
 
 
 	/**
+	 * This version just returns a normal link. I'm assuming most
+	 * buckets will implement this but I want it to be optional.
+	 * @param File|string $f
+	 * @param int $expires [optional] - Expiration time in seconds
+	 * @return string
+	 */
+	public function getTemporaryLinkFor($f, $expires=3600) {
+		return $this->getLinkFor($f);
+	}
+
+
+	/**
 	 * Returns the full path and filename, relative to the BaseURL
 	 * @param File|string $f
 	 * @return string
