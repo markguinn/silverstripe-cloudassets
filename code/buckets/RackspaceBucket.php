@@ -16,6 +16,7 @@ class RackspaceBucket extends CloudBucket
 	const USERNAME    = 'Username';
 	const API_KEY     = 'ApiKey';
 	const SERVICE_NET = 'ServiceNet';
+	const FORCE_DL    = 'ForceDownload';
 
 	/** @var \OpenCloud\ObjectStore\Resource\Container */
 	protected $container;
@@ -56,9 +57,13 @@ class RackspaceBucket extends CloudBucket
 	public function put(File $f) {
 		$fp = fopen($f->getFullPath(), 'r');
 		if (!$fp) throw new Exception("Unable to open file: " . $f->getFilename());
-		$this->container->uploadObject($this->getRelativeLinkFor($f), $fp, array(
-			'FileID'    => $f->ID,
-		));
+
+		$headers = array();
+		if (!empty($this->config[self::FORCE_DL])) {
+			$headers['Content-Disposition'] = 'attachment; filename=' . ($f->hasMethod('getFriendlyName') ? $f->getFriendlyName() : $f->Name);
+		}
+
+		$this->container->uploadObject($this->getRelativeLinkFor($f), $fp, $headers);
 	}
 
 
@@ -77,7 +82,7 @@ class RackspaceBucket extends CloudBucket
 	 */
 	public function rename(File $f, $beforeName, $afterName) {
 		$obj = $this->getFileObjectFor( $this->getRelativeLinkFor($beforeName) );
-		$obj->copy($this->config[self::CONTAINER] . '/' . $this->getRelativeLinkFor($afterName));
+		$obj->copy($this->containerName . '/' . $this->getRelativeLinkFor($afterName));
 		$obj->delete();
 	}
 
