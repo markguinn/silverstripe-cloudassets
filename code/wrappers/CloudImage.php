@@ -167,6 +167,7 @@ class CloudImage extends Image implements CloudAssetInterface
 				// If we now have a valid image, generate a stored meta record for it
 				if (file_exists($cachePath)) {
 					$stored = new CloudImageCachedStore();
+					$stored->Filename = $cacheFile;
 					$stored->SourceID = $this->ID;
 					$stored->write();
 					// all the other fields will get set when the cloud status is updated
