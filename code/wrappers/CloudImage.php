@@ -11,6 +11,11 @@
  */
 class CloudImage extends Image implements CloudAssetInterface
 {
+	private static $has_many = array(
+		'DerivedImages' => 'CloudImageCachedMeta',
+	);
+
+
 	public function Link() {
 		$this->createLocalIfNeeded();
 		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::Link();
@@ -90,39 +95,88 @@ class CloudImage extends Image implements CloudAssetInterface
 
 		if($this->ID && $this->Filename && Director::fileExists($this->Filename)) {
 			$cacheFile = call_user_func_array(array($this, "cacheFilename"), $args);
+			$cachePath = Director::baseFolder()."/".$cacheFile;
 
+			$stored = CloudImageCachedStore::get()->filter('Filename', $cacheFile)->first();
+			if ($stored && !$stored->exists()) $stored = null;
+
+			// If ?flush is present, always wipe existing data and start clean
 			if (isset($_GET['flush'])) {
-				$this->downloadFromCloud();
-
 				// There was a bug here caused by the fact that GDBackend tries
 				// to read the size off the cached image, which would be a placeholder
 				// in certain cases.
 				// I'm not 100% sure what the correct behaviour is here. For now
 				// we'll destroy the existing image, causing it to be re-uploaded
 				// every time. That seems safer if a little bit wasteful.
-				$fn = Director::baseFolder()."/".$cacheFile;
-				if (file_exists($fn)) unlink($fn);
+				if (file_exists($cachePath)) unlink($cachePath);
 
-				call_user_func_array(array($this, "generateFormattedImage"), $args);
-				$this->convertToPlaceholder();
-			} elseif (!file_exists(Director::baseFolder()."/".$cacheFile)) {
-				if ($this->CloudStatus === 'Live' && $this->isLocalMissing()) {
-					$this->downloadFromCloud();
-					call_user_func_array(array($this, "generateFormattedImage"), $args);
-					$this->convertToPlaceholder();
-				} else {
-					call_user_func_array(array($this, "generateFormattedImage"), $args);
+				// delete the existing meta if it existed
+				if ($stored) {
+					$stored->delete();
+					$stored = null;
 				}
 			}
 
-			$cached = new CloudImage_Cached($cacheFile);
-			// Pass through the title so the templates can use it
+			// start building out the record
+			$cached = new CloudImageCached($cacheFile);
 			$cached->Title = $this->Title;
-			// Pass through the parent, to store cached images in correct folder.
 			$cached->ParentID = $this->ParentID;
+
+			// Is there a meta record for this formatted file?
+			if ($stored) {
+				// Has it been successfully uploaded to the cloud?
+				// If so, we can just send this puppy on
+				// If not, is there a local file that's present and correct?
+				// If not, we need to wipe the meta and anything local and regenerate
+				if ($stored->CloudStatus !== 'Live' && $cached->isLocalMissing()) {
+					$stored->delete();
+					$stored = null;
+					if (file_exists($cachePath)) unlink($cachePath);
+				} else {
+					$cached->setStoreRecord($stored);
+				}
+			}
+
+			// If there is no meta record (or an invalid one), is there a local file or placeholder?
+			if (!$stored) {
+				// if the local exists as a placeholder, we need to check if the cloud version is valid
+				if (file_exists($cachePath) && $cached->containsPlaceholder()) {
+					try {
+						$cached->downloadFromCloud();
+					} catch (Exception $e) {
+						// We want to fail silently here if there is any trouble
+						// because we can always regenerate the thumbnail
+					}
+				}
+
+				// If we don't have a valid local version at this point...
+				if ($cached->isLocalMissing()) {
+					// delete whatever might have been there
+					if (file_exists($cachePath)) unlink($cachePath);
+
+					// Regenerate the formatted image
+					if ($this->CloudStatus === 'Live' && $this->isLocalMissing()) {
+						$this->downloadFromCloud();
+						call_user_func_array(array($this, "generateFormattedImage"), $args);
+						$this->convertToPlaceholder();
+					} else {
+						call_user_func_array(array($this, "generateFormattedImage"), $args);
+					}
+				}
+
+				// If we now have a valid image, generate a stored meta record for it
+				if (file_exists($cachePath)) {
+					$stored = new CloudImageCachedStore();
+					$stored->SourceID = $this->ID;
+					$stored->write();
+					// all the other fields will get set when the cloud status is updated
+					$cached->setStoreRecord($stored);
+				}
+			}
 
 			// upload to cloud if needed
 			$cached->updateCloudStatus();
+
 			return $cached;
 		}
 	}
@@ -203,5 +257,6 @@ class CloudImage extends Image implements CloudAssetInterface
 
 		return $numDeleted;
 	}
+
 
 }

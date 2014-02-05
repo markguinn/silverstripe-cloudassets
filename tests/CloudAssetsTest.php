@@ -143,6 +143,13 @@ class CloudAssetsTest extends SapphireTest
 		$bucket = $resized->getCloudBucket();
 		$this->assertTrue($bucket->wasUploaded($resized), 'mock bucket should have recorded an upload');
 
+		$store = $resized->getStoreRecord();
+		$this->assertNotNull($store);
+		$this->assertEquals('Live', $store->CloudStatus);
+		$this->assertGreaterThan(9, $store->CloudSize);
+		$this->assertNotEmpty($store->CloudMetaJson);
+		$this->assertNotEmpty($store->ID);
+
 		// deleting the image should also delete the resize
 		$img->delete();
 		$this->assertTrue($bucket->wasDeleted($resized), 'mock bucket should have recorded a delete');

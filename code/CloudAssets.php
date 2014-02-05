@@ -34,7 +34,7 @@ class CloudAssets extends Object
 	private static $wrappers = array(
 		'File'              => 'CloudFile',
 		'Image'             => 'CloudImage',
-		'CloudImage_Cached' => 'CloudImage_Cached', // this is awkward but prevents it from trying to transform Image_Cached
+		'CloudImageCached'  => 'CloudImageCached', // this is awkward but prevents it from trying to transform Image_Cached
 	);
 
 	/** @var string - placeholder string used for local files */

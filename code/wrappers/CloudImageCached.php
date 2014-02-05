@@ -12,9 +12,10 @@
  * @package cloudassets
  * @subpackage wrappers
  */
-class CloudImage_Cached extends CloudImage
+class CloudImageCached extends CloudImage
 {
-	private $cloudMeta;
+	/** @var CloudImageCachedStore */
+	protected $storeRecord;
 
 	/**
 	 * Create a new cached image.
@@ -31,9 +32,14 @@ class CloudImage_Cached extends CloudImage
 		if (file_exists($this->getFullPath()) && $this->containsPlaceholder()) $this->CloudStatus = 'Live';
 	}
 
+
+	/**
+	 * @return String
+	 */
 	public function getRelativePath() {
 		return $this->getField('Filename');
 	}
+
 
 	/**
 	 * Prevent creating new tables for the cached record
@@ -43,6 +49,7 @@ class CloudImage_Cached extends CloudImage
 	public function requireTable() {
 		return false;
 	}
+
 
 	/**
 	 * Prevent writing the cached image to the database
@@ -56,49 +63,59 @@ class CloudImage_Cached extends CloudImage
 
 
 	/**
-	 * @param string $key [optional] - if not present returns the whole array
-	 * @return array
+	 * @param CloudImageCachedStore $store
+	 * @return $this
 	 */
-	public function getCloudMeta($key = null) {
-		$cache = SS_Cache::factory('CloudImage');
-		if (!isset($this->cloudMeta)) {
-			$data = $cache->load($this->cloudCacheKey());
-			$this->cloudMeta = ($data === false) ? array() : unserialize($data);
-		}
+	public function setStoreRecord(CloudImageCachedStore $store) {
+		$this->storeRecord    = $store;
+		$this->CloudStatus   = $store->CloudStatus;
+		$this->CloudSize     = $store->CloudSize;
+		$this->CloudMetaJson = $store->CloudMetaJson;
+		return $this;
+	}
 
-		if (!empty($key)) {
-			return isset($this->cloudMeta[$key]) ? $this->cloudMeta[$key] : null;
-		} else {
-			return $this->cloudMeta;
+
+	/**
+	 * @return CloudImageCachedStore
+	 */
+	public function getStoreRecord() {
+		return $this->storeRecord;
+	}
+
+
+	/**
+	 * @param $val
+	 */
+	public function setCloudMetaJson($val) {
+		$this->setField('CloudMetaJson', $val);
+		if ($this->storeRecord) {
+			$this->storeRecord->CloudMetaJson = $val;
+			$this->storeRecord->write();
 		}
 	}
 
 
 	/**
-	 * @param string|array $key - passing an array as the first argument replaces the meta data entirely
-	 * @param mixed        $val
-	 * @return File - chainable
+	 * @param $val
 	 */
-	public function setCloudMeta($key, $val = null) {
-		if (is_array($key)) {
-			$data = $key;
-		} else {
-			$data = $this->getCloudMeta();
-			$data[$key] = $val;
+	public function setCloudStatus($val) {
+		$this->setField('CloudStatus', $val);
+		if ($this->storeRecord) {
+			$this->storeRecord->CloudStatus = $val;
+			$this->storeRecord->write();
 		}
-
-		$cache = SS_Cache::factory('CloudImage');
-		$cache->save(serialize($data), $this->cloudCacheKey());
-
-		$this->cloudMeta = $data;
-		return $this->owner;
 	}
 
 
 	/**
-	 * @return string
+	 * @param $val
 	 */
-	private function cloudCacheKey() {
-		return md5($this->Filename);
+	public function setCloudSize($val) {
+		$this->setField('CloudSize', $val);
+		if ($this->storeRecord) {
+			$this->storeRecord->CloudSize = $val;
+			$this->storeRecord->write();
+		}
 	}
+
 }

@@ -14,6 +14,7 @@ class CloudFileExtension extends DataExtension
 		'CloudMetaJson' => 'Text',      // saves any bucket or file-type specific information
 	);
 
+
 	private $inUpdate = false;
 
 
