@@ -30,4 +30,17 @@ class CloudImageCachedStore extends DataObject
 	private static $indexes = array(
 		'Filename'      => true,
 	);
+
+
+	/**
+	 * Constructs an image record that can be used with this meta data
+	 * @return CloudImageCached
+	 */
+	public function getCloudImageCached() {
+		$cached = new CloudImageCached($this->Filename);
+		$cached->Title = $this->Title;
+		$cached->ParentID = $this->ParentID;
+		$cached->setStoreRecord($this);
+		return $cached;
+	}
 }

@@ -100,6 +100,8 @@ class RackspaceBucket extends CloudBucket
 	/**
 	 * This version just returns a normal link. I'm assuming most
 	 * buckets will implement this but I want it to be optional.
+	 * NOTE: I'm not sure how reliably this is working.
+	 *
 	 * @param File|string $f
 	 * @param int $expires [optional] - Expiration time in seconds
 	 * @return string
@@ -107,6 +109,44 @@ class RackspaceBucket extends CloudBucket
 	public function getTemporaryLinkFor($f, $expires=3600) {
 		$obj = $this->getFileObjectFor( $this->getRelativeLinkFor($f) );
 		return $obj->getTemporaryUrl($expires, 'GET');
+	}
+
+
+	/**
+	 * @param $f - File object or filename
+	 * @return bool
+	 * @throws Exception|Guzzle\Http\Exception\ClientErrorResponseException
+	 */
+	public function checkExists($f) {
+		try {
+			$obj = $this->getFileObjectFor($f);
+			return true;
+		} catch (\Guzzle\Http\Exception\ClientErrorResponseException $e) {
+			if ($e->getResponse()->getStatusCode() == 404) {
+				return false;
+			} else {
+				throw $e;
+			}
+		}
+	}
+
+
+	/**
+	 * @param $f - File object or filename
+	 * @return int - if file doesn't exist, returns -1
+	 * @throws Exception|Guzzle\Http\Exception\ClientErrorResponseException
+	 */
+	public function getFileSize($f) {
+		try {
+			$obj = $this->getFileObjectFor($f);
+			return $obj->getContentLength();
+		} catch (\Guzzle\Http\Exception\ClientErrorResponseException $e) {
+			if ($e->getResponse()->getStatusCode() == 404) {
+				return -1;
+			} else {
+				throw $e;
+			}
+		}
 	}
 
 

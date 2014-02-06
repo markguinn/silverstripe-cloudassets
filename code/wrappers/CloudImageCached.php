@@ -52,13 +52,22 @@ class CloudImageCached extends CloudImage
 
 
 	/**
-	 * Prevent writing the cached image to the database
-	 *
-	 * @throws Exception
+	 * Prevent writing the cached image to the database, but write the store record instead
 	 */
 	public function write($showDebug = false, $forceInsert = false, $forceWrite = false, $writeComponents = false) {
 		//throw new Exception("{$this->ClassName} can not be written back to the database.");
 		// NOTE: we need to fail silently on writes because writing is part of the cloud upload process
+		if ($this->storeRecord) $this->storeRecord->write($showDebug, $forceInsert, $forceWrite, $writeComponents);
+	}
+
+
+	/**
+	 * Simulates a delete
+	 */
+	public function delete() {
+		$path = $this->getFullPath();
+		if (file_exists($path)) unlink($path);
+		if ($this->storeRecord) $this->storeRecord->delete();
 	}
 
 
@@ -90,7 +99,7 @@ class CloudImageCached extends CloudImage
 		$this->setField('CloudMetaJson', $val);
 		if ($this->storeRecord) {
 			$this->storeRecord->CloudMetaJson = $val;
-			$this->storeRecord->write();
+			//$this->storeRecord->write();
 		}
 	}
 
@@ -102,7 +111,7 @@ class CloudImageCached extends CloudImage
 		$this->setField('CloudStatus', $val);
 		if ($this->storeRecord) {
 			$this->storeRecord->CloudStatus = $val;
-			$this->storeRecord->write();
+			//$this->storeRecord->write();
 		}
 	}
 
@@ -114,7 +123,7 @@ class CloudImageCached extends CloudImage
 		$this->setField('CloudSize', $val);
 		if ($this->storeRecord) {
 			$this->storeRecord->CloudSize = $val;
-			$this->storeRecord->write();
+			//$this->storeRecord->write();
 		}
 	}
 
