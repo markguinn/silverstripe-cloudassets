@@ -67,10 +67,6 @@ class CloudAssetsFullCheckTask extends BuildTask
 		// 6. Local needs to be wrapped or uploaded             -> uploads as normal (via updateCloudStatus)
 		$file->updateCloudStatus();
 
-		// 1. Local file doesn't exist                          -> downloads from cloud
-		// 2. Local file is a placeholder but KeepLocal is true -> downloads from cloud
-		$file->createLocalIfNeeded();
-
 		$bucket = $file->getCloudBucket();
 		if ($bucket && $bucket->hasMethod('getFileSize')) {
 			$size = $bucket->getFileSize($file);
@@ -101,6 +97,10 @@ class CloudAssetsFullCheckTask extends BuildTask
 				}
 			}
 		}
+
+		// 1. Local file doesn't exist                          -> downloads from cloud
+		// 2. Local file is a placeholder but KeepLocal is true -> downloads from cloud
+		$file->createLocalIfNeeded();
 
 		// 4. Meta data is missing                              -> restores meta
 		if ($file instanceof CloudImage && !$file->getCloudMeta('Dimensions')) {
