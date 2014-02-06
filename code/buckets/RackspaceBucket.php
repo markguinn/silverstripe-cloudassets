@@ -36,17 +36,27 @@ class RackspaceBucket extends CloudBucket
 		if (empty($cfg[self::REGION]))    throw new Exception('RackspaceBucket: missing configuration key - ' . self::REGION);
 		if (empty($cfg[self::USERNAME]))  throw new Exception('RackspaceBucket: missing configuration key - ' . self::USERNAME);
 		if (empty($cfg[self::API_KEY]))   throw new Exception('RackspaceBucket: missing configuration key - ' . self::API_KEY);
+		$this->containerName = $this->config[self::CONTAINER];
+	}
 
-		$client = new Rackspace(Rackspace::US_IDENTITY_ENDPOINT, array(
-			'username'      => $cfg[self::USERNAME],
-			'apiKey'        => $cfg[self::API_KEY],
-		));
 
-		$service = $client->objectStoreService('cloudFiles', $cfg[self::REGION],
-			empty($cfg[self::SERVICE_NET]) ? 'publicURL' : 'internalURL');
+	/**
+	 * @return \OpenCloud\ObjectStore\Resource\Container
+	 */
+	protected function getContainer() {
+		if (!isset($this->container)) {
+			$client = new Rackspace(Rackspace::US_IDENTITY_ENDPOINT, array(
+				'username'      => $this->config[self::USERNAME],
+				'apiKey'        => $this->config[self::API_KEY],
+			));
 
-		$this->containerName = $cfg[self::CONTAINER];
-		$this->container = $service->getContainer($this->containerName);
+			$service = $client->objectStoreService('cloudFiles', $this->config[self::REGION],
+				empty($this->config[self::SERVICE_NET]) ? 'publicURL' : 'internalURL');
+
+			$this->container = $service->getContainer($this->containerName);
+		}
+
+		return $this->container;
 	}
 
 
@@ -63,7 +73,7 @@ class RackspaceBucket extends CloudBucket
 			$headers['Content-Disposition'] = 'attachment; filename=' . ($f->hasMethod('getFriendlyName') ? $f->getFriendlyName() : $f->Name);
 		}
 
-		$this->container->uploadObject($this->getRelativeLinkFor($f), $fp, $headers);
+		$this->getContainer()->uploadObject($this->getRelativeLinkFor($f), $fp, $headers);
 	}
 
 
@@ -92,7 +102,7 @@ class RackspaceBucket extends CloudBucket
 	 * @return string
 	 */
 	public function getContents(File $f) {
-		$obj = $this->container->getObject($this->getRelativeLinkFor($f));
+		$obj = $this->getContainer()->getObject($this->getRelativeLinkFor($f));
 		return $obj->getContent();
 	}
 
@@ -155,6 +165,6 @@ class RackspaceBucket extends CloudBucket
 	 * @return \OpenCloud\ObjectStore\Resource\DataObject
 	 */
 	protected function getFileObjectFor($f) {
-		return $this->container->getPartialObject($this->getRelativeLinkFor($f));
+		return $this->getContainer()->getPartialObject($this->getRelativeLinkFor($f));
 	}
 }
