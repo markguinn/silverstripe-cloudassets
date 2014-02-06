@@ -89,6 +89,7 @@ class CloudAssetsFullCheckTask extends BuildTask
 						if (!isset($this->missing)) $this->missing = fopen(BASE_PATH . '/missing_files.csv', 'a');
 						fputcsv($this->missing, array(date('Y-m-d H:i:s'), $file->ID, $file->Filename));
 						echo " Corrupted in both locations!!!";
+						return;
 					}
 				} else {
 					// 3. Remote file is a placeholder but local in tact    -> clears status and re-uploads
