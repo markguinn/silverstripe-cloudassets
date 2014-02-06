@@ -12,7 +12,7 @@
 class CloudImage extends Image implements CloudAssetInterface
 {
 	private static $has_many = array(
-		'DerivedImages' => 'CloudImageCachedMeta',
+		'DerivedImages' => 'CloudImageCachedStore',
 	);
 
 
