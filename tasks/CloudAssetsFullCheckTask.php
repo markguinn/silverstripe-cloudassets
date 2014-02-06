@@ -42,13 +42,13 @@ class CloudAssetsFullCheckTask extends BuildTask
 
 				$this->processFile($file);
 
-//				if ($file instanceof CloudImage) {
-//					foreach ($file->DerivedImages() as $thumbStore) {
-//						$thumb = $thumbStore->getCloudImageCached();
-//						echo "\n   DERIVED: " . $thumb->Filename;
-//						$this->processFile($thumb);
-//					}
-//				}
+				if ($file instanceof CloudImage) {
+					foreach ($file->DerivedImages() as $thumbStore) {
+						$thumb = $thumbStore->getCloudImageCached();
+						echo "\n   DERIVED: " . $thumb->Filename;
+						$this->processFile($thumb);
+					}
+				}
 
 				echo "\n";
 			}
