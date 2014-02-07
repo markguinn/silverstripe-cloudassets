@@ -27,18 +27,23 @@ class CloudAssetsFullCheckTask extends BuildTask
 	 * @param $request
 	 */
 	public function run($request) {
-		$buckets     = Config::inst()->get('CloudAssets', 'map');
+		$buckets   = Config::inst()->get('CloudAssets', 'map');
+		$start     = (int)$request->requestVar('start');
+		$limit     = (int)$request->requestVar('limit');
+		$path      = $request->requestVar('path');
 
 		foreach ($buckets as $basePath => $cfg) {
+			if (!empty($path) && $basePath != $path) continue;
 			echo "Processing $basePath...\n";
 			$baseQuery = File::get()->filter('Filename:StartsWith', ltrim($basePath, '/'));
 			$total     = $baseQuery->count();
+			if ($start && !$limit) $limit = $total;
+			if ($limit) $baseQuery = $baseQuery->limit($limit, $start);
 			$query     = $baseQuery->dataQuery()->query()->execute();
 			foreach ($query as $i => $row) {
-				if (isset($_GET['start']) && $i < $_GET['start']) continue;
 				$class = $row['ClassName'];
 				$file  = new $class($row);
-				echo "$i/$total: " . $file->Filename;
+				echo ($i+$start) . "/$total: " . $file->Filename;
 
 				$this->processFile($file);
 
