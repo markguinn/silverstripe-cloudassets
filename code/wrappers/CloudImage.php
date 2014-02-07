@@ -184,80 +184,30 @@ class CloudImage extends Image implements CloudAssetInterface
 
 
 	/**
-	 * Remove all of the formatted cached images for this image.
-	 * This is an annoying problem I can't think of a better solution for.
-	 * Below is the 3.1 version of this function copied from Image.
-	 * There is no hook in this function that would allow us to know
-	 * what remote files to delete.
-	 * In 3.2, this function and the encoding method for these files
-	 * totally changed to a base64+json encoding of the arguments.
-	 * Unfortunately, there is still no hook we can use and the other
-	 * methods involved are private instead of protected.
-	 * As a result, I've had to widen the regex. Hopefully that won't
-	 * do any damage. It's more hacky and fragile than I'd prefer, though.
-	 * NOTE: see issue #1 - once that's done we won't need to do this
-	 * MG 1.18.14
+	 * Checks if the local file is an image that can be used and not
+	 * a placeholder or a corrupted file.
 	 *
+	 * @return bool
+	 */
+	public function isLocalValid() {
+		$path = $this->getFullPath();
+		if (!file_exists($path)) return false;
+		return (getimagesize($path) !== false);
+	}
+
+
+	/**
 	 * @return int The number of formatted images deleted
 	 */
 	public function deleteFormattedImages() {
-		if(!$this->Filename) return 0;
-		$bucket = $this->getCloudBucket();
-
-		$numDeleted = 0;
-		$methodNames = $this->allMethodNames(true);
-		$cachedFiles = array();
-
-		$folder = $this->ParentID ? $this->Parent()->Filename : ASSETS_DIR . '/';
-		$cacheDir = Director::getAbsFile($folder . '_resampled/');
-
-		if(is_dir($cacheDir)) {
-			if($handle = opendir($cacheDir)) {
-				while(($file = readdir($handle)) !== false) {
-					// ignore all entries starting with a dot
-					if(substr($file, 0, 1) != '.' && is_file($cacheDir . $file)) {
-						$cachedFiles[] = $file;
-					}
-				}
-				closedir($handle);
-			}
+		foreach ($this->DerivedImages() as $store) {
+			$img = $store->getCloudImageCached();
+			$img->delete();
 		}
 
-		$generateFuncs = array();
-		foreach($methodNames as $methodName) {
-			if(substr($methodName, 0, 8) == 'generate') {
-				$format = substr($methodName, 8);
-				$generateFuncs[] = preg_quote($format);
-			}
-		}
-
-		// All generate functions may appear any number of times in the image cache name.
-		$generateFuncs = implode('|', $generateFuncs);
-		$pattern = "/^(({$generateFuncs})(?:[a-zA-Z0-9\\/\r\n=]+)\\-)+" . preg_quote($this->Name) . "$/i";
-
-		foreach($cachedFiles as $cfile) {
-			if(preg_match($pattern, $cfile)) {
-				if(Director::fileExists($cacheDir . $cfile)) {
-					unlink($cacheDir . $cfile);
-					$numDeleted++;
-
-					if ($bucket && $this->CloudStatus === 'Live') {
-						try {
-							$bucket->delete($folder . '_resampled/' . $cfile);
-						} catch(Exception $e) {
-							if (Director::isDev()) {
-								Debug::log("Failed bucket delete: " . $e->getMessage() . " for " . $this->getFullPath());
-							} else {
-								// Fail silently for now. This will cause the local copy to be served.
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return $numDeleted;
+		// The above should have covered everything but this will clean up any
+		// loose ends that were maybe created before wrapping or fell through a crack
+		parent::deleteFormattedImages();
 	}
-
 
 }
