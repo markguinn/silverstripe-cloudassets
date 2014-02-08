@@ -65,9 +65,19 @@ class CloudImageCached extends CloudImage
 	 * Simulates a delete
 	 */
 	public function delete() {
+		$this->brokenOnDelete = true;
+		$this->onBeforeDelete();
+		if($this->brokenOnDelete) {
+			user_error("$this->class has a broken onBeforeDelete() function."
+			. " Make sure that you call parent::onBeforeDelete().", E_USER_ERROR);
+		}
+
 		$path = $this->getFullPath();
 		if (file_exists($path)) unlink($path);
 		if ($this->storeRecord) $this->storeRecord->delete();
+
+		$this->flushCache();
+		$this->onAfterDelete();
 	}
 
 
