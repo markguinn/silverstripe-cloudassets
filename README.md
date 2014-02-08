@@ -1,12 +1,15 @@
 Cloud Assets Module
 ===================
-[![Build Status](https://travis-ci.org/markguinn/silverstripe-cloudassets.png)](http://travis-ci.org/markguinn/silverstripe-cloudassets)
 
 Allows you to host all or part of the assets folder on a cloud storage container (CDN).
 
 I would consider this beta quality software. We're using it on a couple production sites but it has not yet been widely
 tested across different configurations. You could experience some flakiness and may want to keep a backup of your assets
 initially until you've put it through it's paces, especially if not using LocalCopy mode.
+
+Versions: [![Latest Stable Version](https://poser.pugx.org/markguinn/silverstripe-cloudassets/v/stable.png)](https://packagist.org/packages/markguinn/silverstripe-cloudassets) [![Latest Unstable Version](https://poser.pugx.org/markguinn/silverstripe-cloudassets/v/unstable.png)](https://packagist.org/packages/markguinn/silverstripe-cloudassets)
+Licence: [![License](https://poser.pugx.org/markguinn/silverstripe-cloudassets/license.png)](https://packagist.org/packages/markguinn/silverstripe-cloudassets)
+Quality: [![Build Status](https://travis-ci.org/markguinn/silverstripe-cloudassets.png)](http://travis-ci.org/markguinn/silverstripe-cloudassets) [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/markguinn/silverstripe-cloudassets/badges/quality-score.png?s=506eb40a2197880980ff1f695bde5fe79a4f7442)](https://scrutinizer-ci.com/g/markguinn/silverstripe-cloudassets/) [![Code Coverage](https://scrutinizer-ci.com/g/markguinn/silverstripe-cloudassets/badges/coverage.png?s=a2b5c2c4eb1029c5e064271ac764d3c60b374762)](https://scrutinizer-ci.com/g/markguinn/silverstripe-cloudassets/)
 
 
 Requirements
