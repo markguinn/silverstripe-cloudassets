@@ -56,7 +56,7 @@ class CloudImage extends Image implements CloudAssetInterface
 
 
 	/**
-	 * @param string|int $dim - 'string' or 0 (width) or 1 (height)
+	 * @param string $dim - 'string' or 0 (width) or 1 (height)
 	 * @return int|string
 	 */
 	function getDimensions($dim = "string") {
@@ -88,7 +88,7 @@ class CloudImage extends Image implements CloudAssetInterface
 	 * Just pass the correct number of parameters expected by the working function
 	 *
 	 * @param string $format The name of the format.
-	 * @return Image_Cached
+	 * @return CloudImageCached|null
 	 */
 	public function getFormattedImage($format) {
 		$args = func_get_args();
