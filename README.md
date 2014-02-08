@@ -4,19 +4,17 @@ Cloud Assets Module
 
 Allows you to host all or part of the assets folder on a cloud storage container (CDN).
 
-NOTE: This is still alpha quality software. You will probably experience some flakiness.
+I would consider this beta quality software. We're using it on a couple production sites but it has not yet been widely
+tested across different configurations. You could experience some flakiness and may want to keep a backup of your assets
+initially until you've put it through it's paces, especially if not using LocalCopy mode.
 
 
 Requirements
 ------------
 - Silverstripe 3.1+ (tested against 3.1 and master)
-- Rackspace php-opencloud (not listed as a requirement with composer in case other buckets are used)
-
-*NOTE:* You must install php-opencloud separately if you're using the Rackspace driver.
-
-```
-composer require rackspace/php-opencloud:dev-master
-```
+- Not very useful without a bucket driver such as:
+	- Rackspace CloudFiles: <https://github.com/markguinn/silverstripe-cloudassets-rackspace>
+	- (please let me know if anyone has written others)
 
 
 Example

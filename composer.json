@@ -13,6 +13,9 @@
 		"installer-name": "cloudassets"
 	},
 	"require": {
-		"silverstripe/framework": ">=3.0"
+		"silverstripe/framework": ">=3.1"
+	},
+	"suggest": {
+		"markguinn/silverstripe-cloudassets-rackspace": "Rackspace bucket driver for this module"
 	}
 }
