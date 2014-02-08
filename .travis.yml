@@ -28,7 +28,7 @@ script:
 
 after_script:
  - if [ "$COVERAGE" = "1" ]; then
- - cd shop
+ - cd cloudassets
  - wget https://scrutinizer-ci.com/ocular.phar
  - php ocular.phar code-coverage:upload -v --format=php-clover coverage.xml
  - fi
