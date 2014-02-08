@@ -23,6 +23,24 @@ class CloudAssetsLocalCopyTest extends SapphireTest
 	}
 
 
+	function testUploadAtTheRightTimes() {
+		CloudAssets::inst()->updateAllFiles();
+		$f1 = $this->objFromFixture('File', 'file1-folder1');
+		$bucket = $f1->getCloudBucket();
+		$this->assertTrue($bucket->wasUploaded($f1), 'mock bucket should have recorded an upload');
+
+		$bucket->clearActivityLog();
+		$f1->Title = 'Second Try';
+		$f1->write();
+		$this->assertFalse($bucket->wasUploaded($f1), 'mock bucket should not have recorded a second upload');
+
+		$f1->setCloudMeta('LastPut', time() - 600);
+		$f1->Title = 'Third Try';
+		$f1->write();
+		$this->assertTrue($bucket->wasUploaded($f1), 'mock bucket should have recorded a second upload after messing with LastPut');
+	}
+
+
 	function testDelete() {
 		CloudAssets::inst()->updateAllFiles();
 		$f1 = $this->objFromFixture('File', 'file1-folder1');

@@ -279,6 +279,31 @@ class CloudAssetsTest extends SapphireTest
 	}
 
 
+	// This covers Issue #8 - sometimes a placeholder gets uploaded to the cloud
+	// This happens when there are two file records pointed at the same file
+	// One is uploaded and the file is replaced with a placeholder but the status
+	// on the second file is still Local so it seems to think the placeholder is the
+	// actual file.
+	function testDuplicateFileRecords() {
+		CloudAssets::inst()->updateAllFiles();
+		$f1 = $this->objFromFixture('File', 'file1-folder1');
+
+		$f2 = new File();
+		$f2->Filename = $f1->Filename;
+		$f2->ParentID = $f1->ParentID;
+		$f2->Name     = $f1->Name;
+		$f2->Title    = $f1->Title . ' Duplicate';
+		$f2->write();
+		$f2->updateCloudStatus();
+
+		$placeholder = Config::inst()->get('CloudAssets', 'file_placeholder');
+		$this->assertNotEquals($placeholder, $f1->getCloudBucket()->getContents($f2));
+		$this->assertEquals('Live', $f2->CloudStatus);
+		$this->assertEquals($f1->CloudSize, $f2->CloudSize);
+		$this->assertEquals($f1->CloudMetaJson, $f2->CloudMetaJson);
+	}
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 

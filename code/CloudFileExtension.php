@@ -97,8 +97,8 @@ class CloudFileExtension extends DataExtension
 					$wrapped = $this->owner;
 				}
 
-				// does this file need to be uploaded to storage
-				if ($wrapped->canBeInCloud() && !$wrapped->containsPlaceholder() && !Config::inst()->get('CloudAssets', 'uploads_disabled')) {
+				// does this file need to be uploaded to storage?
+				if ($wrapped->canBeInCloud() && $wrapped->isCloudPutNeeded() && !Config::inst()->get('CloudAssets', 'uploads_disabled')) {
 					try {
 						if ($wrapped->hasMethod('onBeforeCloudPut')) $wrapped->onBeforeCloudPut();
 						$bucket->put($wrapped);
@@ -119,6 +119,20 @@ class CloudFileExtension extends DataExtension
 						} else {
 							// Fail silently for now. This will cause the local copy to be served.
 						}
+					}
+				} elseif ($wrapped->CloudStatus !== 'Live' && $wrapped->containsPlaceholder()) {
+					// If this is a duplicate file, update the status
+					// This shouldn't happen ever and won't happen often but when it does this will be helpful
+					$dup = File::get()->filter(array(
+						'Filename'      => $wrapped->Filename,
+						'CloudStatus'   => 'Live',
+					))->first();
+
+					if ($dup && $dup->exists()) {
+						$wrapped->CloudStatus   = $dup->CloudStatus;
+						$wrapped->CloudSize     = $dup->CloudSize;
+						$wrapped->CloudMetaJson = $dup->CloudMetaJson;
+						$wrapped->write();
 					}
 				}
 
@@ -150,7 +164,7 @@ class CloudFileExtension extends DataExtension
 		$path = $this->owner->getFullPath();
 
 		// check the size first to avoid reading crazy huge files into memory
-		return (filesize($path) == strlen($placeholder) && file_get_contents($path) == $placeholder);
+		return (file_exists($path) && filesize($path) == strlen($placeholder) && file_get_contents($path) == $placeholder);
 	}
 
 

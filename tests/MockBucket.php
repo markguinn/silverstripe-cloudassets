@@ -78,4 +78,14 @@ class MockBucket extends CloudBucket
 		return $newName == $this->renames[$oldName];
 	}
 
+
+	/**
+	 * Wipes upload/delete/etc log
+	 */
+	public function clearActivityLog() {
+		$this->uploads = array();
+		$this->deletes = array();
+		$this->renames = array();
+		$this->uploadContents = array();
+	}
 }
