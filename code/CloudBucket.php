@@ -113,7 +113,7 @@ abstract class CloudBucket extends Object
 	 * @param string $field
 	 * @return string
 	 */
-	public function roundRobinGet($field) {
+	protected function roundRobinGet($field) {
 		if (empty($this->$field) || !is_array($this->$field)) return '';
 		$val = $this->$field;
 		$idx = $field . 'Index';
@@ -132,12 +132,17 @@ abstract class CloudBucket extends Object
 		$base  = null;
 
 		if (count($this->$field) > 1 && is_object($f)) {
+			// If there are multiple urls, use cloud meta to remember
+			// which one we used so the url stays the same for any
+			// given image, allowing the image to still be cached
 			$base = $f->getCloudMeta($field);
 			if (!$base) {
 				$base = $this->roundRobinGet($field);
 				$f->setCloudMeta($field, $base);
+				$f->write();
 			}
 		} else {
+			// If there's only one, don't touch meta data
 			$base = $this->roundRobinGet($field);
 		}
 
