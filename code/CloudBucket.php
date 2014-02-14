@@ -16,11 +16,17 @@ abstract class CloudBucket extends Object
 	/** @var string $localPath - local path being replaced (e.g. assets/Uploads) */
 	protected $localPath;
 
-	/** @var string $baseURL - CDN url */
+	/** @var array $baseURL - CDN url(s) */
 	protected $baseURL;
 
-	/** @var  string $secureURL - CDN url for https (optional) */
+	/** @var int $baseUrlIndex - last index sent if more than one base */
+	protected $baseUrlIndex = 0;
+
+	/** @var  array $secureURL - CDN url(s) for https (optional) */
 	protected $secureURL;
+
+	/** @var int $secureUrlIndex - last index sent if more than one base */
+	protected $secureUrlIndex = 0;
 
 	/** @var  array $config */
 	protected $config;
@@ -62,11 +68,26 @@ abstract class CloudBucket extends Object
 	public function __construct($path, array $cfg=array()) {
 		$this->config    = $cfg;
 		$this->localPath = $path;
-		$this->baseURL   = empty($cfg[self::BASE_URL]) ? (Director::baseURL() . $path) : $cfg[self::BASE_URL];
-		$this->secureURL = empty($cfg[self::SECURE_URL]) ? '' : $cfg[self::SECURE_URL];
+		$this->baseURL   = empty($cfg[self::BASE_URL]) ? array(Director::baseURL() . $path) : $cfg[self::BASE_URL];
+		$this->baseURL   = $this->scrubBasePath( $this->baseURL );
+		$this->secureURL = empty($cfg[self::SECURE_URL]) ? array() : $cfg[self::SECURE_URL];
+		$this->secureURL = $this->scrubBasePath( $this->secureURL );
 		if (substr($this->localPath, -1) != '/') $this->localPath .= '/';
-		if (substr($this->baseURL, -1) != '/') $this->baseURL .= '/';
-		if (!empty($this->secureURL) && substr($this->secureURL, -1) != '/') $this->secureURL .= '/';
+	}
+
+
+	/**
+	 * @param string|array $paths
+	 * @return array
+	 */
+	protected function scrubBasePath($paths) {
+		if (!is_array($paths)) $paths = is_string($paths) ? array($paths) : array();
+
+		foreach ($paths as &$p) {
+			if (strlen($p) > 0 && substr($p, -1) != '/') $p .= '/';
+		}
+
+		return $paths;
 	}
 
 
@@ -74,7 +95,7 @@ abstract class CloudBucket extends Object
 	 * @return string
 	 */
 	public function getBaseURL() {
-		return $this->baseURL;
+		return $this->roundRobinGet('baseURL');
 	}
 
 
@@ -82,7 +103,22 @@ abstract class CloudBucket extends Object
 	 * @return string
 	 */
 	public function getSecureURL() {
-		return $this->secureURL;
+		return $this->roundRobinGet('secureURL');
+	}
+
+
+	/**
+	 * Given an array property, returns the next element
+	 * from it and increments an index field
+	 * @param string $field
+	 * @return string
+	 */
+	public function roundRobinGet($field) {
+		if (empty($this->$field) || !is_array($this->$field)) return '';
+		$val = $this->$field;
+		$idx = $field . 'Index';
+		if (!isset($this->$idx) || $this->$idx >= count($val)) $this->$idx = 0;
+		return $val[ $this->$idx++ ];
 	}
 
 
@@ -91,7 +127,20 @@ abstract class CloudBucket extends Object
 	 * @return string
 	 */
 	public function getLinkFor($f) {
-		$base = Director::is_https() && !empty($this->secureURL) ? $this->secureURL : $this->baseURL;
+		$ssl   = Director::is_https() && !empty($this->secureURL);
+		$field = $ssl ? 'secureURL' : 'baseURL';
+		$base  = null;
+
+		if (count($this->$field) > 1 && is_object($f)) {
+			$base = $f->getCloudMeta($field);
+			if (!$base) {
+				$base = $this->roundRobinGet($field);
+				$f->setCloudMeta($field, $base);
+			}
+		} else {
+			$base = $this->roundRobinGet($field);
+		}
+
 		return $base . $this->getRelativeLinkFor($f);
 	}
 

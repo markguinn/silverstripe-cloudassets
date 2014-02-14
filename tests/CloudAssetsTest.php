@@ -304,6 +304,39 @@ class CloudAssetsTest extends SapphireTest
 	}
 
 
+	function testMultipleBaseURLs() {
+		Config::inst()->remove('CloudAssets', 'map');
+		Config::inst()->update('CloudAssets', 'map', array(
+			'assets/FileTest-folder1'   => array(
+				'BaseURL'   => array('http://cdn1.testcdn.com/', 'http://cdn2.testcdn.com/', 'http://cdn3.testcdn.com/'),
+				'SecureURL' => array('https://cdn1.testcdn.com/', 'https://cdn2.testcdn.com/', 'https://cdn3.testcdn.com/'),
+				'Type'      => 'MockBucket',
+				'LocalCopy' => false,
+			),
+		));
+
+		CloudAssets::inst()->updateAllFiles();
+		$f1 = $this->objFromFixture('File', 'file1-folder1');
+		$f2 = $this->objFromFixture('File', 'file2-folder1');
+		$f3 = $this->objFromFixture('File', 'file3-folder1');
+		$f4 = $this->objFromFixture('File', 'file4-folder1');
+
+		$this->assertEquals('http://cdn1.testcdn.com/File1.txt', $f1->Link(),    'first call should give the first link');
+		$this->assertEquals('http://cdn2.testcdn.com/FileTest-folder1-subfolder1/File2.txt', $f2->Link(),    'second call should give the second link');
+		$this->assertEquals('http://cdn3.testcdn.com/File3.txt', $f3->Link(),    'third call should give the third link');
+		$this->assertEquals('http://cdn1.testcdn.com/File4.txt', $f4->Link(),    'fourth call should give the first link');
+		$this->assertEquals('http://cdn1.testcdn.com/File1.txt', $f1->Link(),    'url should be the same no matter what order');
+		$this->assertEquals('http://cdn1.testcdn.com/File4.txt', $f4->Link(),    'url should be the same no matter what order');
+		$this->assertEquals('http://cdn3.testcdn.com/File3.txt', $f3->Link(),    'url should be the same no matter what order');
+		$this->assertEquals('http://cdn2.testcdn.com/FileTest-folder1-subfolder1/File2.txt', $f2->Link(),    'url should be the same no matter what order');
+
+		Config::inst()->update('Director', 'alternate_protocol', 'https');
+		$this->assertEquals('https://cdn1.testcdn.com/File1.txt', $f1->Link(),   'first call should give the first link (ssl)');
+		$this->assertEquals('https://cdn2.testcdn.com/FileTest-folder1-subfolder1/File2.txt', $f2->Link(),   'second call should give the second link (ssl)');
+		$this->assertEquals('https://cdn1.testcdn.com/File1.txt', $f1->Link(),   'url should be the same no matter what order (ssl)');
+	}
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 

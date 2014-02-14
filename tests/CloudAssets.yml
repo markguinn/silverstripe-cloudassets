@@ -35,6 +35,14 @@ File:
       Filename: assets/FileTest-folder1/FileTest-folder1-subfolder1/File2.txt
       Name: File2.txt
       ParentID: =>Folder.folder1-subfolder1
+   file3-folder1:
+      Filename: assets/FileTest-folder1/FileTest-folder1-subfolder1/File3.txt
+      Name: File3.txt
+      ParentID: =>Folder.folder1
+   file4-folder1:
+      Filename: assets/FileTest-folder1/FileTest-folder1-subfolder1/File4.txt
+      Name: File4.txt
+      ParentID: =>Folder.folder1
 
 Image:
    png:
