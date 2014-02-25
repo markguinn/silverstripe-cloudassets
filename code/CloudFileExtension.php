@@ -54,7 +54,7 @@ class CloudFileExtension extends DataExtension
 	 */
 	public function onAfterDelete() {
 		$bucket = CloudAssets::inst()->map($this->owner->getFilename());
-		if ($bucket) {
+		if ($bucket && !Config::inst()->get('CloudAssets', 'uploads_disabled')) {
 			if ($this->owner->hasMethod('onBeforeCloudDelete')) $this->owner->onBeforeCloudDelete();
 			try {
 				$bucket->delete($this->owner);
