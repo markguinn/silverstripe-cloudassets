@@ -192,11 +192,12 @@ class CloudFileExtension extends DataExtension
 
 
 	/**
+	 * @param int $linkType [optional] - see CloudBucket::LINK_XXX constants
 	 * @return string
 	 */
-	public function getCloudURL() {
+	public function getCloudURL($linkType = CloudBucket::LINK_SMART) {
 		$bucket = $this->getCloudBucket();
-		return $bucket ? $bucket->getLinkFor($this->owner) : '';
+		return $bucket ? $bucket->getLinkFor($this->owner, $linkType) : '';
 	}
 
 

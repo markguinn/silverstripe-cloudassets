@@ -13,6 +13,13 @@ abstract class CloudBucket extends Object
 	const LOCAL_COPY = 'LocalCopy';
 	const TYPE       = 'Type';
 
+	const LINK_SMART = 0;
+	const LINK_HTTP  = 1;
+	const LINK_HTTPS = 2;
+	// just to keep the same language
+	const LINK_BASE  = 1;
+	const LINK_SECURE = 2;
+
 	/** @var string $localPath - local path being replaced (e.g. assets/Uploads) */
 	protected $localPath;
 
@@ -124,11 +131,24 @@ abstract class CloudBucket extends Object
 
 	/**
 	 * @param File|string $f - the string should be the Filename field of a File
+	 * @param int $linkType [optional]
 	 * @return string
 	 */
-	public function getLinkFor($f) {
-		$ssl   = Director::is_https() && !empty($this->secureURL);
-		$field = $ssl ? 'secureURL' : 'baseURL';
+	public function getLinkFor($f, $linkType = self::LINK_SMART) {
+		switch ($linkType) {
+			case self::LINK_HTTP:
+				$field = 'baseURL';
+				break;
+
+			case self::LINK_HTTPS:
+				$field = 'secureURL';
+				break;
+
+			default:
+				$ssl   = Director::is_https() && !empty($this->secureURL);
+				$field = $ssl ? 'secureURL' : 'baseURL';
+		}
+
 		$base  = null;
 
 		if (count($this->$field) > 1 && is_object($f)) {
