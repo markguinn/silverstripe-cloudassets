@@ -263,7 +263,16 @@ class CloudFileExtension extends DataExtension
 		if ($this->owner->CloudStatus === 'Live') {
 			if ($this->getCloudBucket()->isLocalCopyEnabled()) {
 				if (!file_exists($this->owner->getFullPath()) || $this->containsPlaceholder()) {
-					$this->downloadFromCloud();
+					try {
+						$this->downloadFromCloud();
+					} catch(Exception $e) {
+						// I'm not sure what the correct behaviour is here
+						// Pretty sure it'd be better to have a broken image
+						// link than a 500 error though.
+						if (Director::isDev()) {
+							Debug::log("Failed bucket download: " . $e->getMessage() . " for " . $this->owner->getFullPath());
+						}
+					}
 				}
 			} else {
 				if (!file_exists($this->owner->getFullPath())) $this->convertToPlaceholder();
