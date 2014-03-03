@@ -146,6 +146,9 @@ class CloudImage extends Image implements CloudAssetInterface
 					} catch (Exception $e) {
 						// We want to fail silently here if there is any trouble
 						// because we can always regenerate the thumbnail
+						if (CloudAssets::config()->missing_image) {
+							return new CloudImageMissing($this, $args);
+						}
 					}
 				}
 
@@ -156,7 +159,14 @@ class CloudImage extends Image implements CloudAssetInterface
 
 					// Regenerate the formatted image
 					if ($this->CloudStatus === 'Live' && $this->isLocalMissing()) {
-						$this->downloadFromCloud();
+						try {
+							$this->downloadFromCloud();
+						} catch (Exception $e) {
+							if (CloudAssets::config()->missing_image) {
+								return new CloudImageMissing($this, $args);
+							}
+						}
+
 						call_user_func_array(array($this, "generateFormattedImage"), $args);
 						$this->convertToPlaceholder();
 					} else {

@@ -40,6 +40,9 @@ class CloudAssets extends Object
 	/** @var string - placeholder string used for local files */
 	private static $file_placeholder = 'CloudFile';
 
+	/** @var string - if an image is missing on the remote (usually when creating a thumbnail) use this instead */
+	private static $missing_image = 'cloudassets/images/missing.svg';
+
 	/** @var array - only keep one instance of each bucket */
 	protected $bucketCache = array();
 

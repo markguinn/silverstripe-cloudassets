@@ -337,6 +337,19 @@ class CloudAssetsTest extends SapphireTest
 	}
 
 
+	function testMissingImage() {
+		Config::inst()->update('CloudAssets', 'missing_image', 'cloudassets/images/missing.svg');
+		CloudAssets::inst()->updateAllFiles();
+		$img = $this->objFromFixture('Image', 'png');
+		$img->getCloudBucket()->clearActivityLog(); // this will cause it to throw an exception when we try to get the remote
+
+		$thumb = $img->SetWidth(10, 10);
+		$this->assertEquals(10, $thumb->getWidth());
+		$this->assertEquals(10, $thumb->getHeight());
+		$this->assertEquals('/cloudassets/images/missing.svg', $thumb->Link());
+	}
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 

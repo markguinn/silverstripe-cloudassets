@@ -43,10 +43,12 @@ class MockBucket extends CloudBucket
 
 	/**
 	 * @param File $f
+	 * @throws Exception
 	 * @return string
 	 */
 	public function getContents(File $f) {
-		return isset($this->uploadContents[$f->Filename]) ? $this->uploadContents[$f->Filename] : null;
+		if (isset($this->uploadContents[$f->Filename])) return $this->uploadContents[$f->Filename];
+		throw new Exception("Remote file not found");
 	}
 
 
