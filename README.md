@@ -24,6 +24,7 @@ Requirements
 - Silverstripe 3.1+ (tested against 3.1 and master)
 - Not very useful without a bucket driver such as:
 	- Rackspace CloudFiles: <https://github.com/markguinn/silverstripe-cloudassets-rackspace>
+	- Amazon S3: <https://github.com/edlinklater/silverstripe-cloudassets-s3>
 	- (please let me know if anyone has written others)
 
 
