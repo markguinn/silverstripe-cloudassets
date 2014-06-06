@@ -14,6 +14,17 @@ class CloudAssets extends Object
 	/** @var bool - kill switch for uploading local changes to the cdn - useful for safeguarding local development environments */
 	private static $uploads_disabled = false;
 
+	/** @var bool - if this is set to true, the uploads will only occur when running UpdateCloudAssetsTask or CloudAssetsFullCheckTask */
+	// COMING SOON
+	//private static $offline_uploads_only = false;
+
+	/** @var bool - you probably want this true overall, but in some cases like BuildTasks we may not want that */
+	// COMING SOON
+	//private static $fail_silently = true;
+
+	/** @var string - if you have Monolog or something registered with the Injector - anything with info, error, and debug methods */
+	private static $logger = '';
+
 	/** @var array */
 	private static $map = array(
 		//'assets/folder/path' => array(
@@ -65,21 +76,24 @@ class CloudAssets extends Object
 		$maps = Config::inst()->get('CloudAssets', 'map');
 
 		foreach ($maps as $path => $cfg) {
-			if (empty($cfg[ CloudBucket::TYPE ])) continue;
+			$this->getLogger()->debug("checking $path against $filename => ".strpos($filename, $path));
 			if (strpos($filename, $path) === 0) {
 				if (!isset($this->bucketCache[$path])) {
 					// merge in default config if needed
 					$defaults = Config::inst()->get('CloudAssets', 'defaults');
 					if (!empty($defaults) && is_array($defaults)) $cfg = array_merge($defaults, $cfg);
+					if (empty($cfg[ CloudBucket::TYPE ])) continue;
 
 					// instantiate the bucket
 					$this->bucketCache[$path] = Injector::inst()->create($cfg[CloudBucket::TYPE], $path, $cfg);
 				}
 
+				$this->getLogger()->debug("CloudAssets: Mapping $filename to bucket $path");
 				return $this->bucketCache[$path];
 			}
 		}
 
+		$this->getLogger()->debug("CloudAssets: No mapping found for $filename - ");
 		return null;
 	}
 
@@ -115,4 +129,29 @@ class CloudAssets extends Object
 	public function clearBucketCache() {
 		$this->bucketCache = array();
 	}
+
+
+	/**
+	 * @return object
+	 */
+	public function getLogger() {
+		$service = Config::inst()->get('CloudAssets', 'logger');
+		$inj = Injector::inst();
+		if (!empty($service) && $inj->hasService($service)) {
+			return $inj->get($service);
+		} else {
+			return $inj->get('CloudAssets_NullLogger');
+		}
+	}
+
+}
+
+
+class CloudAssets_NullLogger
+{
+	public function log($str) {}
+	public function info($str) {}
+	public function debug($str) {}
+	public function warn($str) {}
+	public function error($str) {}
 }

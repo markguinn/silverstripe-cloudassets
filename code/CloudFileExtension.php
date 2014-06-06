@@ -35,6 +35,7 @@ class CloudFileExtension extends DataExtension
 
 			// Tell the remote to rename the file (or delete and recreate or whatever)
 			if ($this->owner->hasMethod('onBeforeCloudRename')) $this->owner->onAfterCloudRename($pathBefore, $pathAfter);
+			CloudAssets::inst()->getLogger()->info("CloudAssets: Renaming $pathBefore to $pathAfter");
 			$bucket->rename($this->owner, $pathBefore, $pathAfter);
 			if ($this->owner->hasMethod('onAfterCloudRename')) $this->owner->onAfterCloudRename($pathBefore, $pathAfter);
 		}
@@ -56,15 +57,14 @@ class CloudFileExtension extends DataExtension
 		$bucket = CloudAssets::inst()->map($this->owner->getFilename());
 		if ($bucket && !Config::inst()->get('CloudAssets', 'uploads_disabled')) {
 			if ($this->owner->hasMethod('onBeforeCloudDelete')) $this->owner->onBeforeCloudDelete();
+
 			try {
+				CloudAssets::inst()->getLogger()->info("CloudAssets: deleting {$this->owner->getFilename()}");
 				$bucket->delete($this->owner);
 			} catch(Exception $e) {
-				if (Director::isDev()) {
-					Debug::log("Failed bucket delete: " . $e->getMessage() . " for " . $this->owner->getFullPath());
-				} else {
-					// Fail silently for now. This will cause the local copy to be served.
-				}
+				CloudAssets::inst()->getLogger()->errror("CloudAssets: Failed bucket delete: " . $e->getMessage() . " for " . $this->owner->getFullPath());
 			}
+
 			if ($this->owner->hasMethod('onAfterCloudDelete')) $this->owner->onAfterCloudDelete();
 		}
 	}
@@ -89,6 +89,7 @@ class CloudFileExtension extends DataExtension
 			$wrapClass = $cloud->getWrapperClass($this->owner->ClassName);
 			if (!empty($wrapClass)) {
 				if ($wrapClass != $this->owner->ClassName) {
+					$cloud->getLogger()->debug("CloudAssets: wrapping {$this->owner->ClassName} to $wrapClass. ID={$this->owner->ID}");
 					$this->owner->ClassName = $wrapClass;
 					$this->owner->write();
 					$wrapped = DataObject::get($wrapClass)->byID($this->owner->ID);
@@ -101,6 +102,7 @@ class CloudFileExtension extends DataExtension
 				if ($wrapped->canBeInCloud() && $wrapped->isCloudPutNeeded() && !Config::inst()->get('CloudAssets', 'uploads_disabled')) {
 					try {
 						if ($wrapped->hasMethod('onBeforeCloudPut')) $wrapped->onBeforeCloudPut();
+						$cloud->getLogger()->debug("CloudAssets: uploading file ".$wrapped->getFilename());
 						$bucket->put($wrapped);
 
 						$wrapped->setCloudMeta('LastPut', time());
@@ -113,12 +115,8 @@ class CloudFileExtension extends DataExtension
 					} catch(Exception $e) {
 						$wrapped->CloudStatus = 'Error';
 						$wrapped->write();
-
-						if (Director::isDev()) {
-							Debug::log("Failed bucket upload: " . $e->getMessage() . " for " . $wrapped->getFullPath());
-						} else {
-							// Fail silently for now. This will cause the local copy to be served.
-						}
+						$cloud->getLogger()->error("CloudAssets: Failed bucket upload: " . $e->getMessage() . " for " . $wrapped->getFullPath());
+						// Fail silently for now. This will cause the local copy to be served.
 					}
 				} elseif ($wrapped->CloudStatus !== 'Live' && $wrapped->containsPlaceholder()) {
 					// If this is a duplicate file, update the status
@@ -129,6 +127,7 @@ class CloudFileExtension extends DataExtension
 					))->first();
 
 					if ($dup && $dup->exists()) {
+						$cloud->getLogger()->warn("CloudAssets: fixing status for duplicate file: {$wrapped->ID} and {$dup->ID}");
 						$wrapped->CloudStatus   = $dup->CloudStatus;
 						$wrapped->CloudSize     = $dup->CloudSize;
 						$wrapped->CloudMetaJson = $dup->CloudMetaJson;
@@ -175,6 +174,7 @@ class CloudFileExtension extends DataExtension
 		$bucket = $this->getCloudBucket();
 		if ($bucket && !$bucket->isLocalCopyEnabled()) {
 			$path = $this->owner->getFullPath();
+			CloudAssets::inst()->getLogger()->debug("CloudAssets: converting $path to placeholder");
 			Filesystem::makeFolder(dirname($path));
 			file_put_contents($path, Config::inst()->get('CloudAssets', 'file_placeholder'));
 		}
@@ -246,6 +246,7 @@ class CloudFileExtension extends DataExtension
 				$contents = $bucket->getContents($this->owner);
 				$path     = $this->owner->getFullPath();
 				Filesystem::makeFolder(dirname($path));
+				CloudAssets::inst()->getLogger()->debug("CloudAssets: downloading $path from cloud (size=".strlen($contents).")");
 				// if there was an error and we overwrote the local file with empty or null, it could delete the remote
 				// file as well. Better to err on the side of not writing locally when we should than that.
 				if (!empty($contents)) file_put_contents($path, $contents);
@@ -269,9 +270,7 @@ class CloudFileExtension extends DataExtension
 						// I'm not sure what the correct behaviour is here
 						// Pretty sure it'd be better to have a broken image
 						// link than a 500 error though.
-						if (Director::isDev()) {
-							Debug::log("Failed bucket download: " . $e->getMessage() . " for " . $this->owner->getFullPath());
-						}
+						CloudAssets::inst()->getLogger()->error("CloudAssets: Failed bucket download: " . $e->getMessage() . " for " . $this->owner->getFullPath());
 					}
 				}
 			} else {

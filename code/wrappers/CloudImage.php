@@ -92,8 +92,9 @@ class CloudImage extends Image implements CloudAssetInterface
 	 */
 	public function getFormattedImage($format) {
 		$args = func_get_args();
+		$logger = CloudAssets::inst()->getLogger();
 
-		if($this->ID && $this->Filename && Director::fileExists($this->Filename)) {
+		if ($this->ID && $this->Filename && Director::fileExists($this->Filename)) {
 			$cacheFile = call_user_func_array(array($this, "cacheFilename"), $args);
 			$cachePath = Director::baseFolder()."/".$cacheFile;
 
@@ -108,6 +109,7 @@ class CloudImage extends Image implements CloudAssetInterface
 				// I'm not 100% sure what the correct behaviour is here. For now
 				// we'll destroy the existing image, causing it to be re-uploaded
 				// every time. That seems safer if a little bit wasteful.
+				$logger->debug("CloudAssets: deleting cached image because of flush: $cachePath");
 				if (file_exists($cachePath)) unlink($cachePath);
 
 				// delete the existing meta if it existed
@@ -156,6 +158,7 @@ class CloudImage extends Image implements CloudAssetInterface
 				if ($cached->isLocalMissing()) {
 					// delete whatever might have been there
 					if (file_exists($cachePath)) unlink($cachePath);
+					$logger->debug("CloudAssets: generating formatted image at $cachePath");
 
 					// Regenerate the formatted image
 					if ($this->CloudStatus === 'Live' && $this->isLocalMissing()) {
