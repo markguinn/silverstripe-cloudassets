@@ -4,3 +4,7 @@ Name: cloudassetsextensions
 File:
   extensions:
     - CloudFileExtension
+
+Injector:
+  Upload:
+    class: CloudAwareUpload
