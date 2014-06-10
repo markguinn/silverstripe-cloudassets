@@ -10,12 +10,16 @@
 		"homepage": "http://github.com/markguinn"
 	}],
 	"extra": {
-		"installer-name": "cloudassets"
+		"installer-name": "cloudassets",
+		"branch-alias": {
+			"dev-master": "1.0.x-dev"
+		}
 	},
 	"require": {
-		"silverstripe/framework": ">=3.1"
+		"silverstripe/framework": "~3.1"
 	},
 	"suggest": {
-		"markguinn/silverstripe-cloudassets-rackspace": "Rackspace bucket driver for this module"
+		"markguinn/silverstripe-cloudassets-rackspace": "Rackspace bucket driver",
+		"edlinklater/silverstripe-cloudassets-s3": "Amazon S3 bucker driver"
 	}
 }
