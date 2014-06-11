@@ -62,7 +62,7 @@ class CloudFileExtension extends DataExtension
 				CloudAssets::inst()->getLogger()->info("CloudAssets: deleting {$this->owner->getFilename()}");
 				$bucket->delete($this->owner);
 			} catch(Exception $e) {
-				CloudAssets::inst()->getLogger()->errror("CloudAssets: Failed bucket delete: " . $e->getMessage() . " for " . $this->owner->getFullPath());
+				CloudAssets::inst()->getLogger()->error("CloudAssets: Failed bucket delete: " . $e->getMessage() . " for " . $this->owner->getFullPath());
 			}
 
 			if ($this->owner->hasMethod('onAfterCloudDelete')) $this->owner->onAfterCloudDelete();
