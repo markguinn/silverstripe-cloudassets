@@ -262,8 +262,8 @@ class CloudFileExtension extends DataExtension
 	 */
 	public function createLocalIfNeeded() {
 		if ($this->owner->CloudStatus === 'Live') {
-            $bucket = $this->getCloudBucket();
-            if ($bucket && $bucket->isLocalCopyEnabled()) {
+			$bucket = $this->getCloudBucket();
+			if ($bucket && $bucket->isLocalCopyEnabled()) {
 				if (!file_exists($this->owner->getFullPath()) || $this->containsPlaceholder()) {
 					try {
 						$this->downloadFromCloud();
