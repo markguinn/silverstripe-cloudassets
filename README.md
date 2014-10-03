@@ -1,5 +1,6 @@
 Cloud Assets Module
 ===================
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/markguinn/silverstripe-cloudassets?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Allows you to host all or part of the assets folder on a cloud storage container (CDN).
 
