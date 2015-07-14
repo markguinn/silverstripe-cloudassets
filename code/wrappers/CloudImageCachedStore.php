@@ -16,18 +16,18 @@
  */
 class CloudImageCachedStore extends DataObject
 {
-	private static $db = array(
+	public static $db = array(
 		'Filename'      => 'Varchar(255)',
 		'CloudStatus'   => "Enum('Local,Live,Error','Local')",
 		'CloudSize'     => 'Int',
 		'CloudMetaJson' => 'Text',      // saves any bucket or file-type specific information
 	);
 
-	private static $has_one = array(
+	public static $has_one = array(
 		'Source'        => 'CloudImage',
 	);
 
-	private static $indexes = array(
+	public static $indexes = array(
 		'Filename'      => true,
 	);
 
