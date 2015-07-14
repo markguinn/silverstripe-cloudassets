@@ -11,7 +11,7 @@
  */
 class CloudImage extends Image implements CloudAssetInterface
 {
-	private static $has_many = array(
+	public static $has_many = array(
 		'DerivedImages' => 'CloudImageCachedStore',
 	);
 
@@ -90,7 +90,7 @@ class CloudImage extends Image implements CloudAssetInterface
 	 * @param string $format The name of the format.
 	 * @return CloudImageCached|null
 	 */
-	public function getFormattedImage($format) {
+	public function getFormattedImage($format, $arg1 = NULL, $arg2 = NULL) {
 		$args = func_get_args();
 		$logger = CloudAssets::inst()->getLogger();
 
