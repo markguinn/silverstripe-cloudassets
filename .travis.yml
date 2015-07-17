@@ -2,17 +2,23 @@ language: php
 sudo: false
 php:
  - 5.3
- - 5.6
 
 env:
  - DB=MYSQL CORE_RELEASE=3.1
- - DB=MYSQL CORE_RELEASE=master
- - DB=PGSQL CORE_RELEASE=master
 
 matrix:
   include:
     - php: 5.4
-      env: DB=MYSQL CORE_RELEASE=master COVERAGE=1
+      env: DB=PGSQL CORE_RELEASE=3.1
+    - php: 5.5
+      env: DB=SQLITE CORE_RELEASE=3.1 COVERAGE=1
+    - php: 5.6
+      env: DB=MYSQL CORE_RELEASE=3.2
+    - php: 5.6
+      env: DB=MYSQL CORE_RELEASE=master
+  allow_failures:
+    - env: DB=MYSQL CORE_RELEASE=3.2
+    - env: DB=MYSQL CORE_RELEASE=master
 
 before_script:
  - pear -q install --onlyreqdeps pear/PHP_CodeSniffer
@@ -20,9 +26,6 @@ before_script:
  - git clone git://github.com/silverstripe-labs/silverstripe-travis-support.git ~/travis-support
  - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss
  - cd ~/builds/ss
-
-#script:
-# - phpunit cloudassets/tests/
 
 script:
  - "if [ \"$COVERAGE\" = \"\" ]; then phpunit -c cloudassets/phpunit.xml.dist; fi"
