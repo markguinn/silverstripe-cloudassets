@@ -27,6 +27,6 @@ before_script:
  - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss
  - cd ~/builds/ss
 
-script: ~/build/ss/cloudassets/tests/travis/run_build.sh
+script: ./cloudassets/tests/travis/run_build.sh
 
-after_script: ~/build/ss/cloudassets/test/travis/upload_coverage.sh
+after_script: ./cloudassets/test/travis/upload_coverage.sh
