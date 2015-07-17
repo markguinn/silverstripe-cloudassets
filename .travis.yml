@@ -27,13 +27,6 @@ before_script:
  - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss
  - cd ~/builds/ss
 
-script:
- - "if [ \"$COVERAGE\" = \"\" ]; then phpunit -c cloudassets/phpunit.xml.dist; fi"
- - "if [ \"$COVERAGE\" = \"1\" ]; then phpunit -c cloudassets/phpunit.xml.dist --coverage-clover cloudassets/coverage.xml; fi"
+script: ~/build/ss/cloudassets/tests/travis/run_build.sh
 
-after_script:
- - if [ "$COVERAGE" = "1" ]; then
- - cd cloudassets
- - wget https://scrutinizer-ci.com/ocular.phar
- - php ocular.phar code-coverage:upload -v --format=php-clover coverage.xml
- - fi
+after_script: ~/build/ss/cloudassets/test/travis/upload_coverage.sh
