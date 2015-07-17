@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  *
  * @author Mark Guinn <mark@adaircreative.com>
  * @date 01.10.2014
@@ -8,7 +8,7 @@
  */
 class CloudAssetsTest extends SapphireTest
 {
-	protected static $fixture_file = 'CloudAssets.yml';
+	public static $fixture_file = 'CloudAssets.yml';
 
 	function testMap() {
 		$bucket = CloudAssets::inst()->map('assets/FileTest-folder1/File1.txt');
