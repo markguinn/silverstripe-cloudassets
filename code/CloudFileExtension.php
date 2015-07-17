@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  *
  * @author Mark Guinn <mark@adaircreative.com>
  * @date 01.10.2014
@@ -8,7 +8,7 @@
  */
 class CloudFileExtension extends DataExtension
 {
-	private static $db = array(
+	public static $db = array(
 		'CloudStatus'   => "Enum('Local,Live,Error','Local')",
 		'CloudSize'     => 'Int',
 		'CloudMetaJson' => 'Text',      // saves any bucket or file-type specific information

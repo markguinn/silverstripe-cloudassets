@@ -9,10 +9,10 @@
 class CloudAssets extends Object
 {
 	/** @var bool - kill switch via config - if true the module will ignore all cloud buckets */
-	private static $disabled = false;
+	public static $disabled = false;
 
 	/** @var bool - kill switch for uploading local changes to the cdn - useful for safeguarding local development environments */
-	private static $uploads_disabled = false;
+	public static $uploads_disabled = false;
 
 	/** @var bool - if this is set to true, the uploads will only occur when running UpdateCloudAssetsTask or CloudAssetsFullCheckTask */
 	// COMING SOON
@@ -23,10 +23,10 @@ class CloudAssets extends Object
 	//private static $fail_silently = true;
 
 	/** @var string - if you have Monolog or something registered with the Injector - anything with info, error, and debug methods */
-	private static $logger = '';
+	public static $logger = '';
 
 	/** @var array */
-	private static $map = array(
+	public static $map = array(
 		//'assets/folder/path' => array(
 		//  'Type'      => 'RackspaceBucket',
 		//  'BaseURL'   => 'http://cdnurl.com/',
@@ -39,20 +39,20 @@ class CloudAssets extends Object
 	);
 
 	/** @var array - merged in with all bucket configs */
-	private static $defaults = array();
+	public static $defaults = array();
 
 	/** @var array - add to this if you have other file subclasses floating around */
-	private static $wrappers = array(
+	public static $wrappers = array(
 		'File'              => 'CloudFile',
 		'Image'             => 'CloudImage',
 		'CloudImageCached'  => 'CloudImageCached', // this is awkward but prevents it from trying to transform Image_Cached
 	);
 
 	/** @var string - placeholder string used for local files */
-	private static $file_placeholder = 'CloudFile';
+	public static $file_placeholder = 'CloudFile';
 
 	/** @var string - if an image is missing on the remote (usually when creating a thumbnail) use this instead */
-	private static $missing_image = 'cloudassets/images/missing.svg';
+	public static $missing_image = 'cloudassets/images/missing.svg';
 
 	/** @var array - only keep one instance of each bucket */
 	protected $bucketCache = array();
