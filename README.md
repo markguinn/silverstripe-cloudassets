@@ -14,7 +14,7 @@ Versions:
 Licence: [![License](https://poser.pugx.org/markguinn/silverstripe-cloudassets/license.png)](https://packagist.org/packages/markguinn/silverstripe-cloudassets)
 
 Quality:
-[![Build Status](https://travis-ci.org/markguinn/silverstripe-cloudassets.png)](http://travis-ci.org/markguinn/silverstripe-cloudassets)
+[![Build Status](https://travis-ci.org/markguinn/silverstripe-cloudassets.svg?branch=master)](http://travis-ci.org/markguinn/silverstripe-cloudassets)
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/markguinn/silverstripe-cloudassets/badges/quality-score.png?s=506eb40a2197880980ff1f695bde5fe79a4f7442)](https://scrutinizer-ci.com/g/markguinn/silverstripe-cloudassets/)
 [![Code Coverage](https://scrutinizer-ci.com/g/markguinn/silverstripe-cloudassets/badges/coverage.png?s=a2b5c2c4eb1029c5e064271ac764d3c60b374762)](https://scrutinizer-ci.com/g/markguinn/silverstripe-cloudassets/)
 
