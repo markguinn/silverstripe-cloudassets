@@ -145,7 +145,7 @@ abstract class CloudBucket extends Object
 				break;
 
 			default:
-				$ssl   = Director::is_https() && !empty($this->secureURL);
+				$ssl   = (Director::protocol() == 'https://') && !empty($this->secureURL);
 				$field = $ssl ? 'secureURL' : 'baseURL';
 		}
 
