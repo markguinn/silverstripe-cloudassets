@@ -11,33 +11,39 @@
  */
 class CloudFile extends File implements CloudAssetInterface
 {
-	public function Link() {
-		$this->createLocalIfNeeded();
-		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::Link();
-	}
+    public function Link()
+    {
+        $this->createLocalIfNeeded();
+        return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::Link();
+    }
 
-	public function RelativeLink() {
-		$this->createLocalIfNeeded();
-		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::RelativeLink();
-	}
+    public function RelativeLink()
+    {
+        $this->createLocalIfNeeded();
+        return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::RelativeLink();
+    }
 
-	public function getURL() {
-		$this->createLocalIfNeeded();
-		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::getURL();
-	}
+    public function getURL()
+    {
+        $this->createLocalIfNeeded();
+        return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::getURL();
+    }
 
-	public function getAbsoluteURL() {
-		$this->createLocalIfNeeded();
-		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::getAbsoluteURL();
-	}
+    public function getAbsoluteURL()
+    {
+        $this->createLocalIfNeeded();
+        return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::getAbsoluteURL();
+    }
 
-	public function getAbsoluteSize() {
-		$this->createLocalIfNeeded();
-		return $this->CloudStatus == 'Live' ? $this->CloudSize : parent::getAbsoluteSize();
-	}
+    public function getAbsoluteSize()
+    {
+        $this->createLocalIfNeeded();
+        return $this->CloudStatus == 'Live' ? $this->CloudSize : parent::getAbsoluteSize();
+    }
 
-	public function exists() {
-		$this->createLocalIfNeeded();
-		return parent::exists();
-	}
+    public function exists()
+    {
+        $this->createLocalIfNeeded();
+        return parent::exists();
+    }
 }
