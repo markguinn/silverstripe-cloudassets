@@ -14,7 +14,7 @@
  */
 interface CloudAssetInterface
 {
-//	public function Link() {
+    //	public function Link() {
 //		$this->createLocalIfNeeded();
 //		return $this->CloudStatus == 'Live' ? $this->getCloudURL() : parent::Link();
 //	}
