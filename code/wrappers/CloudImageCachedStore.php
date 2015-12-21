@@ -16,31 +16,32 @@
  */
 class CloudImageCachedStore extends DataObject
 {
-	private static $db = array(
-		'Filename'      => 'Varchar(255)',
-		'CloudStatus'   => "Enum('Local,Live,Error','Local')",
-		'CloudSize'     => 'Int',
-		'CloudMetaJson' => 'Text',      // saves any bucket or file-type specific information
-	);
+    private static $db = array(
+        'Filename'      => 'Varchar(255)',
+        'CloudStatus'   => "Enum('Local,Live,Error','Local')",
+        'CloudSize'     => 'Int',
+        'CloudMetaJson' => 'Text',      // saves any bucket or file-type specific information
+    );
 
-	private static $has_one = array(
-		'Source'        => 'CloudImage',
-	);
+    private static $has_one = array(
+        'Source'        => 'CloudImage',
+    );
 
-	private static $indexes = array(
-		'Filename'      => true,
-	);
+    private static $indexes = array(
+        'Filename'      => true,
+    );
 
 
-	/**
-	 * Constructs an image record that can be used with this meta data
-	 * @return CloudImageCached
-	 */
-	public function getCloudImageCached() {
-		$cached = new CloudImageCached($this->Filename);
-		$cached->Title = $this->Title;
-		$cached->ParentID = $this->ParentID;
-		$cached->setStoreRecord($this);
-		return $cached;
-	}
+    /**
+     * Constructs an image record that can be used with this meta data
+     * @return CloudImageCached
+     */
+    public function getCloudImageCached()
+    {
+        $cached = new CloudImageCached($this->Filename);
+        $cached->Title = $this->Title;
+        $cached->ParentID = $this->ParentID;
+        $cached->setStoreRecord($this);
+        return $cached;
+    }
 }

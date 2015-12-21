@@ -11,18 +11,19 @@
  */
 class CloudAwareUpload extends Upload
 {
-	/**
-	 * Get file-object, either generated from {load()},
-	 * or manually set.
-	 *
-	 * @return File
-	 */
-	public function getFile() {
-		if ($this->file && get_class($this->file) != $this->file->ClassName) {
-			// If the class is Image and the ClassName says it should be a CloudImage, just reload it
-			$this->file = DataObject::get($this->file->ClassName)->byID($this->file->ID);
-		}
+    /**
+     * Get file-object, either generated from {load()},
+     * or manually set.
+     *
+     * @return File
+     */
+    public function getFile()
+    {
+        if ($this->file && get_class($this->file) != $this->file->ClassName) {
+            // If the class is Image and the ClassName says it should be a CloudImage, just reload it
+            $this->file = DataObject::get($this->file->ClassName)->byID($this->file->ID);
+        }
 
-		return $this->file;
-	}
+        return $this->file;
+    }
 }
