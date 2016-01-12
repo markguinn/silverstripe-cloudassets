@@ -17,6 +17,9 @@ Quality:
 [![Build Status](https://travis-ci.org/markguinn/silverstripe-cloudassets.svg?branch=master)](http://travis-ci.org/markguinn/silverstripe-cloudassets)
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/markguinn/silverstripe-cloudassets/badges/quality-score.png?s=506eb40a2197880980ff1f695bde5fe79a4f7442)](https://scrutinizer-ci.com/g/markguinn/silverstripe-cloudassets/)
 [![Code Coverage](https://scrutinizer-ci.com/g/markguinn/silverstripe-cloudassets/badges/coverage.png?s=a2b5c2c4eb1029c5e064271ac764d3c60b374762)](https://scrutinizer-ci.com/g/markguinn/silverstripe-cloudassets/)
+[![codecov.io](https://codecov.io/github/markguinn/silverstripe-cloudassets/coverage.svg?branch=master)](https://codecov.io/github/markguinn/silverstripe-cloudassets?branch=master)
+
+![codecov.io](https://codecov.io/github/markguinn/silverstripe-cloudassets/branch.svg?branch=master)
 
 Support:
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/markguinn/silverstripe-cloudassets?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
