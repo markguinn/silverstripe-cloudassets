@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  *
  * @author Mark Guinn <mark@adaircreative.com>
  * @date 01.10.2014
@@ -9,6 +9,7 @@
 class CloudAssetsTest extends SapphireTest
 {
     protected static $fixture_file = 'CloudAssets.yml';
+    protected $usesDatabase = true;
 
     public function testMap()
     {

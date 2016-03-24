@@ -9,7 +9,7 @@
 class CloudAssetsLocalCopyTest extends SapphireTest
 {
     protected static $fixture_file = 'CloudAssets.yml';
-
+    protected $usesDatabase = true;
 
     public function testUpload()
     {
