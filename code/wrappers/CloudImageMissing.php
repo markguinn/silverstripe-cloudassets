@@ -33,6 +33,8 @@ class CloudImageMissing extends Image
             switch ($args[0]) {
                 case 'SetWidth';
                 case 'SetHeight':
+                case 'ScaleWidth':
+                case 'ScaleHeight':
                     $this->dimensions = $args[1] . 'x' . $args[1];
                     break;
 

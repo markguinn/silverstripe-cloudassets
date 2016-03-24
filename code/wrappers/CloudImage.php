@@ -123,6 +123,7 @@ class CloudImage extends Image implements CloudAssetInterface
             $cacheFile = call_user_func_array(array($this, "cacheFilename"), $args);
             $cachePath = Director::baseFolder()."/".$cacheFile;
 
+            /** @var CloudImageCachedStore $stored */
             $stored = CloudImageCachedStore::get()->filter('Filename', $cacheFile)->first();
             if ($stored && !$stored->exists()) {
                 $stored = null;

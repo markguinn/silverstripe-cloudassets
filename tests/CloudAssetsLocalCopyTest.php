@@ -274,7 +274,7 @@ class CloudAssetsLocalCopyTest extends SapphireTest
             mkdir(ASSETS_PATH);
         }
 
-        /* Create a test folders for each of the fixture references */
+        // Create a test folders for each of the fixture references
         $folderIDs = $this->allFixtureIDs('Folder');
         foreach ($folderIDs as $folderID) {
             $folder = DataObject::get_by_id('Folder', $folderID);
@@ -283,7 +283,7 @@ class CloudAssetsLocalCopyTest extends SapphireTest
             }
         }
 
-        /* Create a test files for each of the fixture references */
+        // Create a test files for each of the fixture references
         $fileIDs = $this->allFixtureIDs('File');
         foreach ($fileIDs as $fileID) {
             if ($fileID == 'png') {

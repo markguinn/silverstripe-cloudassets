@@ -49,9 +49,9 @@ class CloudAssetsTest extends SapphireTest
         // there may be more methods we need to test here?
 
         $f2 = $this->objFromFixture('File', 'asdf');
-        $this->assertEquals('/assets/FileTest.txt', $f2->Link());
+        $this->assertStringEndsWith('/assets/FileTest.txt', $f2->Link());
         $this->assertEquals('assets/FileTest.txt', $f2->RelativeLink());
-        $this->assertEquals('/assets/FileTest.txt', $f2->getURL());
+        $this->assertStringEndsWith('/assets/FileTest.txt', $f2->getURL());
         $this->assertEquals(Director::absoluteBaseURL() . 'assets/FileTest.txt', $f2->getAbsoluteURL());
     }
 
@@ -366,7 +366,7 @@ class CloudAssetsTest extends SapphireTest
         $thumb = $img->SetWidth(10, 10);
         $this->assertEquals(10, $thumb->getWidth());
         $this->assertEquals(10, $thumb->getHeight());
-        $this->assertEquals('/cloudassets/images/missing.svg', $thumb->Link());
+        $this->assertStringEndsWith('/cloudassets/images/missing.svg', $thumb->Link());
     }
 
 

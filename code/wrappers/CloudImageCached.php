@@ -35,6 +35,13 @@ class CloudImageCached extends CloudImage
         }
     }
 
+    /**
+     * @return bool
+     */
+    public function exists()
+    {
+        return file_exists($this->getFullPath());
+    }
 
     /**
      * @return String
