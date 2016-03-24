@@ -4,6 +4,8 @@
  * with Image because things like formatting and dimensions don't
  * work the same with a placeholder file.
  *
+ * @mixin CloudFileExtension
+ *
  * @author Mark Guinn <mark@adaircreative.com>
  * @date 01.10.2014
  * @package cloudassets
@@ -79,10 +81,18 @@ class CloudImage extends Image implements CloudAssetInterface
         // otherwise we need to resort to stored dimensions because the
         // file may be in the cloud and the local may be a placeholder
         $val = $this->getCloudMeta('Dimensions');
-        if (empty($val)) {
+        if (empty($val) || !preg_match('/^\d+x\d+$/', $val)) {
             $this->downloadFromCloud();
             $val = parent::getDimensions('string');
             $this->convertToPlaceholder();
+
+            if (preg_match('/^\d+x\d+$/', $val)) {
+                $this->setCloudMeta('Dimensions', $val);
+                $this->write();
+            } else {
+                CloudAssets::inst()->getLogger()->error("Corrupted image/metadata in {$this->ID} =>  {$val}");
+                $val = "1x1";
+            }
         }
 
         if ($dim === 'string') {

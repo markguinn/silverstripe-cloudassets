@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ * This is added to all File objects for shared functionality.
  *
  * @author Mark Guinn <mark@adaircreative.com>
  * @date 01.10.2014
@@ -14,6 +14,8 @@ class CloudFileExtension extends DataExtension
         'CloudMetaJson' => 'Text',      // saves any bucket or file-type specific information
     );
 
+    /** @var File|CloudFileExtension */
+    protected $owner;
 
     private $inUpdate = false;
 
@@ -40,7 +42,7 @@ class CloudFileExtension extends DataExtension
 
             // Tell the remote to rename the file (or delete and recreate or whatever)
             if ($this->owner->hasMethod('onBeforeCloudRename')) {
-                $this->owner->onAfterCloudRename($pathBefore, $pathAfter);
+                $this->owner->onBeforeCloudRename($pathBefore, $pathAfter);
             }
             CloudAssets::inst()->getLogger()->info("CloudAssets: Renaming $pathBefore to $pathAfter");
             $bucket->rename($this->owner, $pathBefore, $pathAfter);
