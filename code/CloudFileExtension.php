@@ -40,6 +40,11 @@ class CloudFileExtension extends DataExtension
                 return;
             }
 
+            // If filename is not changed, don't do anything.
+            if($pathAfter === $pathBefore) {
+                return;
+            }
+
             // Tell the remote to rename the file (or delete and recreate or whatever)
             if ($this->owner->hasMethod('onBeforeCloudRename')) {
                 $this->owner->onBeforeCloudRename($pathBefore, $pathAfter);
@@ -110,9 +115,9 @@ class CloudFileExtension extends DataExtension
             if (!empty($wrapClass)) {
                 if ($wrapClass != $this->owner->ClassName) {
                     $cloud->getLogger()->debug("CloudAssets: wrapping {$this->owner->ClassName} to $wrapClass. ID={$this->owner->ID}");
-                    $this->owner->ClassName = $wrapClass;
-                    $this->owner->write();
-                    $wrapped = DataObject::get($wrapClass)->byID($this->owner->ID);
+                    $cloudFile = $this->owner->newClassInstance($wrapClass);
+                    $cloudFile->write();
+                    $wrapped = DataObject::get($wrapClass)->byID($cloudFile->ID);
                     if ($wrapped->hasMethod('onAfterCloudWrap')) {
                         $wrapped->onAfterCloudWrap();
                     }
