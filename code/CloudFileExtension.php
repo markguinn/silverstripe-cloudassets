@@ -210,6 +210,7 @@ class CloudFileExtension extends DataExtension
             CloudAssets::inst()->getLogger()->debug("CloudAssets: converting $path to placeholder");
             Filesystem::makeFolder(dirname($path));
             file_put_contents($path, Config::inst()->get('CloudAssets', 'file_placeholder'));
+            clearstatcache();
         }
 
         return $this->owner;
