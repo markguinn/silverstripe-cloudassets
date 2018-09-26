@@ -6,7 +6,7 @@
  * @date 01.10.2014
  * @package cloudassets
  */
-class CloudAssets extends Object
+class CloudAssets extends SS_Object
 {
     /** @var bool - kill switch via config - if true the module will ignore all cloud buckets */
     private static $disabled = false;

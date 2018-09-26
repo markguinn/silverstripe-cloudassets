@@ -6,7 +6,7 @@
  * @date 01.10.2014
  * @package cloudassets
  */
-abstract class CloudBucket extends Object
+abstract class CloudBucket extends SS_Object
 {
     const BASE_URL   = 'BaseURL';
     const SECURE_URL = 'SecureURL';
